@@ -1,0 +1,10 @@
+505 : Auth error
+300 : Auction filter
+305 : team filter
+310 : upload filter
+
+400 : auction service error code
+410 : player service error code
+420 : team service error code
+
+500 : adminrouter error

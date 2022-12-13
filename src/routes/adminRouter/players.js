@@ -1,5 +1,5 @@
-const playerService = require("../services/players");
-const utils = require("../utils/index")
+const playerService = require("../../services/players");
+const utils = require("../../utils/index")
 
 const players = {
     get : async (req,res) => {

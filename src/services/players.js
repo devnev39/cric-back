@@ -33,7 +33,7 @@ module.exports = {
 		},ERRORCODE);
 	},
 	updatePlayer : async (playerJson) => {
-		return await utils.resultwrapper(async () => {
+		return await utils.trywrapper(async () => {
 			await Player.findOneAndReplace({SRNO : playerJson.SRNO},playerJson);
 			return {status : 200};
 		},ERRORCODE);

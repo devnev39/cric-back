@@ -12,9 +12,10 @@ const upload = async (req,res,next) => {
         const result = Player.find({SRNO : req.body.player.SRNO});
         if(result.length) {error(res,ERRORCODE,"Cannot create player with existing Sr.No. !");return;}
         next();
+        return;
     }
     if(req.files && Object.keys(req.files).length != 0){
-        const file = req.files.uploadFile;
+        const file = req.files.files;
         try {
             await file.mv(path.join(__dirname,"..","..",file.name));
             next();

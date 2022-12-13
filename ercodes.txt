@@ -2,9 +2,13 @@
 300 : Auction filter
 305 : team filter
 310 : upload filter
+315 : query filter
 
 400 : auction service error code
 410 : player service error code
 420 : team service error code
+430 : queryrunner error code
+
+600 : modelScema error code
 
 500 : adminrouter error

@@ -1,5 +1,5 @@
-const teamService = require("../services/teams");
-const utils = require("../utils/index");
+const teamService = require("../../services/teams");
+const utils = require("../../utils/index");
 
 module.exports = {
     get : async (req,res) => {

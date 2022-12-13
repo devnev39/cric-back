@@ -1,5 +1,5 @@
-const auctionService = require("../services/auction");
-const utils = require("../utils/index");
+const auctionService = require("../../services/auction");
+const utils = require("../../utils/index");
 
 module.exports = {
     get : async (req,res) => await utils.resultwrapper(auctionService.getAuction,req,res),

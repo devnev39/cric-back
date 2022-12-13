@@ -4,7 +4,7 @@ const session = require("express-session");
 const bodyParser = require("body-parser");
 const fileUpload = require("express-fileupload");
 
-const routes = require("../routes/index");
+const routes = require("../routes/adminRouter/index");
 const middlewares = require("../middleware/index");
 
 const production = process.env.NODE_ENV === 'production';

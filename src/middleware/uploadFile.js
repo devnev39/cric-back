@@ -8,7 +8,7 @@ const ERRORCODE = 310;
 
 const upload = async (req,res,next) => {
     if(req.body.player){
-        if((valid = playerValidator(req.body.player,["IMGURL"])) != true) {error(res,ERRORCODE,valid);return;}
+        if((valid = playerValidator(req.body.player,["IMGURL","SRNO"])) != true) {error(res,ERRORCODE,valid);return;}
         const result = Player.find({SRNO : req.body.player.SRNO});
         if(result.length) {error(res,ERRORCODE,"Cannot create player with existing Sr.No. !");return;}
         next();

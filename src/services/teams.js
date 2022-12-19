@@ -10,6 +10,7 @@ module.exports = {
     },
     addTeam : async (teamJson) => {
         return await utils.trywrapper(async () => {
+            if(!teamJson.No) teamJson.No = Team.countDocuments() + 1;
             const t = new Team(teamJson);
             await t.save();
             return {status : 200};

@@ -5,6 +5,8 @@ const auctionShema = mongoose.Schema({
     No : Number,
     Name : String,
     MaxBudget : Number,
+    Password : String,
+    Status : String,
     Teams : [Team.schema]
 });
 

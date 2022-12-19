@@ -1,5 +1,5 @@
 module.exports = {
-    auth : require("./auth"),
+    auth : require("./auths"),
     upload : require("./uploadFile"),
     teamFilter : require("./teamFilter"),
     auctionFilter : require("./auctionFilter"),

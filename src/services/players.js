@@ -10,10 +10,11 @@ module.exports = {
 		},ERRORCODE);
 	},
     addPlayers : async (playerJson) => {
-        // If undefined add all players in data folder file
+        // If playerJson undefined add all players in data folder file
         // else add the player in json
         return await utils.trywrapper(async () => {
 			if(playerJson){
+				if(!playerJson.SRNO) playerJson.SRNO = await Player.countDocuments()+1;
 	            const p = new Player(playerJson);
 	            await p.save();
 	        }else{

@@ -2,5 +2,6 @@ module.exports = {
     readJson : require("./reader"),
     resultwrapper : require("./resultwrapper"),
     error : require("./error"),
-    trywrapper : require("./trywrapper")
+    trywrapper : require("./trywrapper"),
+    Auths : require("./Auths")
 }

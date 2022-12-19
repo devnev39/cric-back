@@ -4,12 +4,15 @@ const ERRORCODE = 400;
 module.exports = {
     getAuction : async () => {
         return await trywrapper(async () => {
-            const result = await Auction.find();
+            let result = await Auction.find();
+            result.forEach(ele => ele.Password = undefined);
             return {status : 200, data:result};
         });
     },
     addAuction : async (auctionJson) => {
         return await trywrapper(async () => {
+            if(!auctionJson.No) auctionJson.No = await Auction.countDocuments()+1;
+            auctionJson.Status = "red";
             const a = new Auction(auctionJson);
             await a.save();
             return {status : 200};

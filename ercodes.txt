@@ -1,4 +1,3 @@
-505 : Auth error
 300 : Auction filter
 305 : team filter
 310 : upload filter
@@ -11,4 +10,7 @@
 
 600 : modelScema error code
 
-500 : adminrouter error
+500 : error in parsing json body
+
+505 : Admin auth error
+510 : Auction auth error

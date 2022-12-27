@@ -7,18 +7,15 @@ const trywrapper = require("./trywrapper");
 module.exports = {
     auctionAuth : async (req,res) => {
         const response = await trywrapper(async ()=> {
-            const a = await auction.find({No : +req.params.auction_id});
-            if(a.length){
-                const pass = decrypt.decrypt(req.body.password);
-                let result = false;
-                bcrypt.compare(pass,a[0].Password,(err,r) => {
-                    if(err){throw err}
-                    if(r) result = r;
-                    if(req.session) req.session.isAuctionAuthenticated = r;
-                });
-                if(result) return {status : 200};
-                else return {status : 510,data : "Incorrect credintials !"};
-            }
+            const a = await auction.findById(req.body._id);
+            const pass = decrypt.decrypt(req.body.Password);
+            const result = await bcrypt.compare(pass,a.Password);
+            if(result) if(req.session) req.session.isAuctionAuthenticated = result;
+            if(result) if(req.session) req.session.authenticatedAuctionId = req.body._id;
+            
+            if(result) return {status : 200};
+            else return {status : 510,data : "Incorrect credintials !"};
+            
         },510);
         res.json(response);
     },

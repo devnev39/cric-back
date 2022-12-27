@@ -4,7 +4,7 @@ const routes = require("../routes/generalRouter/index");
 
 const router = express.Router();
 
-router.route("/auth/auctions/:auction_id")
+router.route("/auth/auction/:auction_id")
 .post(routes.auths.auctionAuth)
 
 router.route("/auth/admin")
@@ -23,7 +23,9 @@ router.route("/auction/query")
 .post(middlewares.queryFilter.auctionQueryFilter,routes.queries.auctionq)
 
 router.route("/auction")
-.get(routes.auction.get)
+.get(middlewares.authenticatedAuctionFilter,routes.auction.get)
 .post(middlewares.auctionFilter,routes.auction.post)
+
+router.get("/logout",routes.auths.logoutAuction);
 
 module.exports = router;

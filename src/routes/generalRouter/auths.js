@@ -11,5 +11,12 @@ module.exports = {
         // Check the admin password against ours
         // Return status
         utils.Auths.adminAuth(req,res);
+    },
+    logoutAuction : async (req,res) => {
+        if(req.session) if(req.session.isAuctionAuthenticated && req.session.authenticatedAuctionId){
+            req.session.isAuctionAuthenticated = false;
+            req.session.authenticatedAuctionId = undefined;
+            res.json({status : 200});
+        }else res.json({status : 510,data : "No authenticated auction !"});
     }
 }

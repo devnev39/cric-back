@@ -8,9 +8,13 @@
 420 : team service error code
 430 : queryrunner error code
 
+440 : auction (one) service error
+
 600 : modelScema error code
 
 500 : error in parsing json body
 
 505 : Admin auth error
 510 : Auction auth error
+
+601 : Already authenticated, get auctions

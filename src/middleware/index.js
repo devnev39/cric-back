@@ -1,7 +1,8 @@
-module.exports = {
+module.exports = middlewares = {
     auth : require("./auths"),
     upload : require("./uploadFile"),
     teamFilter : require("./teamFilter"),
     auctionFilter : require("./auctionFilter"),
-    queryFilter : require("./queryFilter")
+    queryFilter : require("./queryFilter"),
+    authenticatedAuctionFilter : require("./authenticatedAuctionFilter")
 };

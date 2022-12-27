@@ -1,7 +1,11 @@
 require("dotenv").config();
 const express = require("express");
+const middlewares = require("../middleware/index");
 const routes = require("../routes/auctionRouter/index");
 
-const auctionRouter = express.Router();
+const router = express.Router();
 
-module.exports = auctionRouter;
+router.route("/auction/:auction_id")
+.get(middlewares.auth.auctionAuth,routes.getAuction)
+
+module.exports = router;

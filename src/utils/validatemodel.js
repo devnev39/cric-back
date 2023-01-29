@@ -1,10 +1,12 @@
 const auction = require("../models/auction");
 const player = require("../models/player");
 const team = require("../models/team");
+const wimodels = require("../models/wimodels");
 const validatormessagewrapper = require("./validatormessagewrapper");
 const modelValidator = require("./modelvalidator");
 const jsonValidator = require("./jsonmodelvalidator");
 const queryJsonSchema = require("../config/queryShema");
+const jsonmodelvalidator = require("./jsonmodelvalidator");
 
 module.exports.auctionValidator = (auctionJson,neglect) => {
     return validatormessagewrapper(modelValidator,auctionJson,auction,neglect);
@@ -16,6 +18,10 @@ module.exports.teamValidator = (teamJson,neglect) => {
 
 module.exports.playerValidator = (playerJson,neglect) => {
     return validatormessagewrapper(modelValidator,playerJson,player,neglect);
+}
+
+module.exports.playerValidatorWimodel = (playerJson,neglect) => {
+    return validatormessagewrapper(jsonmodelvalidator,playerJson,wimodels.player,neglect);
 }
 
 const checkObjectForKeys = (model,param) => {

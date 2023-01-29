@@ -26,6 +26,6 @@ app.use((err,req,res,next) => {
 app.use([auctionRouter,generalRouter,adminRouter]);
 
 app.route("/*")
-.get((req,res) => {res.json({data : "Not found !"})});
+.get((req,res) => {res.json({data : "Not found !", status : 404})});
 
 module.exports = app;

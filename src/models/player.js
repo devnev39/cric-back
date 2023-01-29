@@ -10,7 +10,10 @@ const playerSchema = mongoose.Schema({
     BasePrice : Number,
     IPL2022Team : String,
     AuctionedPrice : Number,
-    IMGURL : String
+    IMGURL : String,
+    Edited : Boolean,
+    SOLD : String,
+    SoldPrice : Number
 });
 
 module.exports = mongoose.model('Player',playerSchema);

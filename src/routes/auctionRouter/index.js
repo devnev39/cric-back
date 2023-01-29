@@ -1,9 +1,8 @@
 const auction = require("../../models/auction");
-const player = require("../../models/player");
-const team = require("../../models/team");
-const queryRunner = require("../../services/queryRunner");
+const { updateAuction, deleteAuction } = require("../../services/auction");
 const utils = require("../../utils");
-const { resultwrapper } = require("../../utils");
+const teams = require("./teams");
+const players = require("./players")
 
 const ERRORCODE = 440;
 
@@ -14,5 +13,9 @@ module.exports = {
             a.Password = undefined;
             return {status : 200,data : a};
         },ERRORCODE);
-    },req,res)
+    },req,res),
+    updateAuction : async (req,res) => await utils.resultwrapper(updateAuction,req,res,req.body.auction),
+    deleteAuction : async (req,res) => await utils.resultwrapper(deleteAuction,req,res,req.body.auction),
+    teams : teams,
+    players : players
 }

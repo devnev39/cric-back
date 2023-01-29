@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const player = require("./player");
 const Team = require("./team");
 
 const auctionShema = mongoose.Schema({
@@ -7,7 +8,12 @@ const auctionShema = mongoose.Schema({
     MaxBudget : Number,
     Password : String,
     Status : String,
-    Teams : [Team.schema]
+    poolingMethod : String,
+    Teams : [Team.schema],
+    Add : [player.schema],
+    Rmv : [player.schema],
+    dPlayers : [player.schema],
+    cPlayers : [player.schema]
 });
 
 module.exports = mongoose.model("Auction",auctionShema);

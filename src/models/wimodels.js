@@ -20,3 +20,11 @@ module.exports.auction = {
     MaxBudget : "number",
     Password : "password"
 }
+
+module.exports.publicAuctionViewModel = {
+    Name : "text",
+    MaxBudget : "number",
+    No : "number",
+    _id : "text",
+    Status : "text"
+}

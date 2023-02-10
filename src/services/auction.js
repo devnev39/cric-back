@@ -1,14 +1,14 @@
 const Auction = require("../models/auction");
-const decrypt = require("../utils/decrypt");
-const trywrapper = require("../utils/trywrapper");
 const bcrypt = require("bcrypt");
 const player = require("../models/player");
+const { filterObject, trywrapper, decrypt } = require("../utils/index");
+const { publicAuctionViewModel } = require("../models/wimodels");
 const ERRORCODE = 400;
 module.exports = {
     getAuction : async () => {
         return await trywrapper(async () => {
             let result = await Auction.find();
-            result.forEach(ele => {ele.Password = undefined;ele.Teams = undefined});
+            result = result.map(a => filterObject(a,publicAuctionViewModel));
             return {status : 200, data:result};
         });
     },

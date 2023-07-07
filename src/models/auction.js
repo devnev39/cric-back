@@ -9,6 +9,7 @@ const auctionShema = mongoose.Schema({
     Password : String,
     Status : String,
     poolingMethod : String,
+    Rules : Object,
     Teams : [Team.schema],
     Add : [player.schema],
     Rmv : [player.schema],

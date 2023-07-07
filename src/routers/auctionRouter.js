@@ -25,4 +25,8 @@ router.route("/auction/:auction_id/players")
 .delete(middlewares.auth.auctionAuth,routes.players.deletePlayers)
 .copy(middlewares.auth.auctionAuth,routes.players.uploadPlayers)
 
+router.route("/auction/:auction_id/bid")
+.post(middlewares.auth.auctionAuth,routes.bid.placeBid)
+.delete(middlewares.auth.auctionAuth,routes.bid.revertBid)
+
 module.exports = router;

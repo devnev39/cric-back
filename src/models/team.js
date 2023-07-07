@@ -6,6 +6,7 @@ const teamSchema = mongoose.Schema({
     Name : String,
     Budget : Number,
     Current : Number,
+    AuctionMaxBudget : Number,
     Players : {type : [Player.schema]},
     Score : Number
 });

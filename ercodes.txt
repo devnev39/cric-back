@@ -18,3 +18,5 @@
 510 : Auction auth error
 
 601 : Already authenticated, get auctions
+
+701 : Bid path error

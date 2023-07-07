@@ -13,7 +13,8 @@ const playerSchema = mongoose.Schema({
     IMGURL : String,
     Edited : Boolean,
     SOLD : String,
-    SoldPrice : Number
+    SoldPrice : Number,
+    team_id : String
 });
 
 module.exports = mongoose.model('Player',playerSchema);

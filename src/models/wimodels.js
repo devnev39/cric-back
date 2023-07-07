@@ -28,3 +28,15 @@ module.exports.publicAuctionViewModel = {
     _id : "text",
     Status : "text"
 }
+
+module.exports.PlayerRuleModel = {
+    BasePrice : "number",
+    AuctionedPrice : "number",
+    SoldPrice : "number"
+}
+
+module.exports.TeamRuleModel = {
+    Budget : "number",
+    Current : "number",
+    AuctionMaxBudget : "number"
+}

@@ -4,7 +4,9 @@ const ERRORCODE = 600;
 const modelDictionary = {
     'player' : webInputModels.player,
     'team' : webInputModels.team,
-    'auction' : webInputModels.auction
+    'auction' : webInputModels.auction,
+    "PlayerRuleModel" : webInputModels.PlayerRuleModel,
+    "TeamRuleModel" : webInputModels.TeamRuleModel
 }
 module.exports =  (req,res) => {
     if(Object.keys(modelDictionary).indexOf(req.params.model) == -1){utils.error(res,ERRORCODE,"Requested model not found in dictionary !");return;}

@@ -4,5 +4,6 @@ module.exports = {
     error : require("./error"),
     trywrapper : require("./trywrapper"),
     Auths : require("./Auths"),
-    filterObject : require("./filterObject")
+    filterObject : require("./filterObject"),
+    decrypt : require("./decrypt")
 }

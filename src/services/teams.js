@@ -13,6 +13,8 @@ module.exports = {
         return await utils.trywrapper(async () => {
             const a = await Auction.findById(req.params.auction_id);
             if(!req.body.team.No) req.body.team.No = a.Teams.length + 1;
+            req.body.team.Current = req.body.team.Budget;
+            req.body.team.AuctionMaxBudget = a.MaxBudget;
             const t = new Team(req.body.team);
             a.Teams.push(t);
             a.save();

@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const player = require("./player");
 const Team = require("./team");
+const Rule = require("./rule");
 
 const auctionShema = mongoose.Schema({
     No : Number,
@@ -9,7 +10,7 @@ const auctionShema = mongoose.Schema({
     Password : String,
     Status : String,
     poolingMethod : String,
-    Rules : Object,
+    Rules : [Rule.schema],
     Teams : [Team.schema],
     Add : [player.schema],
     Rmv : [player.schema],

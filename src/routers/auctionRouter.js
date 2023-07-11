@@ -29,4 +29,8 @@ router.route("/auction/:auction_id/bid")
 .post(middlewares.auth.auctionAuth,routes.bid.placeBid)
 .delete(middlewares.auth.auctionAuth,routes.bid.revertBid)
 
+router.route("/auction/:auction_id/rule")
+.post(middlewares.auth.auctionAuth,routes.rule.addRule)
+.delete(middlewares.auth.auctionAuth,routes.rule.deleteRule)
+
 module.exports = router;

@@ -17,8 +17,12 @@ module.exports = {
             req.body.team.AuctionMaxBudget = a.MaxBudget;
             const t = new Team(req.body.team);
             a.Teams.push(t);
-            a.save();
-            return {status : 200};
+            await a.save();
+            b = JSON.parse(JSON.stringify(a));
+            b.cPlayers = null;
+            b.dPlayers = null;
+            if(req.io) await req.io.emit(req.params.auction_id, b);
+            return {status : 200, data : a};
         },ERRORCODE);
     },
     deleteTeam : async (req) => {
@@ -29,6 +33,10 @@ module.exports = {
             a.Teams.pull({_id : req.params.team_id});
             for(let team of a.Teams) if(team.No > ind+1) team.No -= 1
             await a.save();
+            b = JSON.parse(JSON.stringify(a));
+            b.cPlayers = null;
+            b.dPlayers = null;
+            if(req.io) await req.io.emit(req.params.auction_id, b);
             return {status : 200};
         },ERRORCODE);
     },
@@ -46,7 +54,12 @@ module.exports = {
                     
             //     }
             // }
-            return {status : 200};
+            const a = await Auction.findById(req.params.auction_id);
+            b = JSON.parse(JSON.stringify(a));
+            b.cPlayers = null;
+            b.dPlayers = null;
+            if(req.io) await req.io.emit(req.params.auction_id, b);
+            return {status : 200, data : a};
         },ERRORCODE);
     }
 }

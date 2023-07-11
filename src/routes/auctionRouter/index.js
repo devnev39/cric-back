@@ -4,6 +4,7 @@ const utils = require("../../utils");
 const teams = require("./teams");
 const players = require("./players");
 const bid = require("./bid");
+const rule = require("./rule")
 
 const ERRORCODE = 440;
 
@@ -19,5 +20,6 @@ module.exports = {
     deleteAuction : async (req,res) => await utils.resultwrapper(deleteAuction,req,res,req.body.auction),
     teams : teams,
     players : players,
-    bid : bid
+    bid : bid,
+    rule : rule
 }

@@ -20,6 +20,7 @@
     "express-upload": "^0.1.0",
     "lodash": "^4.17.21",
     "mathjs": "^11.5.1",
-    "mongoose": "^6.7.5"
+    "mongoose": "^6.7.5",
+    "socket.io": "^4.7.1"
   }
 }

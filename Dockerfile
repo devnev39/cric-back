@@ -4,5 +4,6 @@ COPY package*.json /app/
 RUN npm install react-scripts@5.0.1 -g --silent
 RUN npm ci
 COPY . /app
+ENV NODE_ENV=production
 EXPOSE 8080
 CMD [ "node", "server.js" ]

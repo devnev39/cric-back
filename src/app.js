@@ -18,6 +18,8 @@ io.on("disconnection", (socket) => {
     console.log("Disconnection from : ",socket)
 })
 
+console.log("production : ",production);
+
 app.use(session({
     secret : process.env.SESS_SECRET,
     resave : false,

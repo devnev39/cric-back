@@ -5,6 +5,7 @@ const adminRouter = require('./routers/adminRouter');
 const generalRouter = require('./routers/generalRouter');
 const auctionRouter = require("./routers/auctionRouter");
 const bodyParser = require("body-parser");
+const cors = require("cors");
 const production = process.env.NODE_ENV === 'production';
 const app = express();
 const server = require("http").createServer(app);
@@ -16,6 +17,8 @@ io.on("connection",(socket) => {
 io.on("disconnection", (socket) => {
     console.log("Disconnection from : ",socket)
 })
+
+app.use(cors())
 
 app.use(session({
     secret : process.env.SESS_SECRET,

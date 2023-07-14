@@ -5,6 +5,7 @@ module.exports = {
         }else next();
     },
     auctionAuth : (req,res,next) => {
+        console.log(req.session);
         if(!req.session.isAuctionAuthenticated){
             res.json({status : 510,data : "Incorrect credentials",POST : `/auth/auction/${req.params.auction_id}`});
         }else next();

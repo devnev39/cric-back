@@ -17,6 +17,8 @@ module.exports = {
             else return {status : 510,data : "Incorrect credintials !"};
             
         },510);
+        console.log(req.session);
+        console.log(response);
         res.json(response);
     },
     adminAuth : async (req,res) => {

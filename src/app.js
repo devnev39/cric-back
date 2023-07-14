@@ -18,8 +18,6 @@ io.on("disconnection", (socket) => {
     console.log("Disconnection from : ",socket)
 })
 
-app.use(cors())
-
 app.use(session({
     secret : process.env.SESS_SECRET,
     resave : false,
@@ -28,6 +26,11 @@ app.use(session({
         secure : production
     }
 }));
+
+app.use(cors({
+    origin : ["http://localhost:3001","https://cric-front.onrender.com"],
+    credentials : true
+}))
 
 app.use((err,req,res,next) => {
     if(err){ res.json({status : 500,data : err}); }

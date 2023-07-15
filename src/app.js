@@ -25,9 +25,14 @@ app.use(session({
     resave : false,
     saveUninitialized : false,
     cookie : {
-        secure : production
+        sameSite : "none",
+        httpOnly : false,
+        secure : production,
+        maxAge : 6 * 60 * 60 * 1000,
     }
 }));
+
+app.enable("trust proxy");
 
 app.use(cors({
     origin : ["http://localhost:3001","https://cric-front.onrender.com"],

@@ -29,6 +29,7 @@ app.use(session({
         httpOnly : production,
         secure : production,
         maxAge : 6 * 60 * 60 * 1000,
+        domain : "onrender.com"
     }
 }));
 

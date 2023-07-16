@@ -9,7 +9,16 @@ const cors = require("cors");
 const production = process.env.NODE_ENV === 'production';
 const app = express();
 const server = require("http").createServer(app);
-const io = require("socket.io")(server);
+
+const origins = ["http://localhost:3001","https://cric-front.onrender.com","http://192.168.0.107:3001","https://cric-front.ddnsking.com"];
+
+const io = require("socket.io")(server, {
+    cors : {
+        origin : origins,
+        method : ["GET","POST"],
+        credentials : true
+    }
+});
 
 io.on("connection",(socket) => {
     console.log("Connected to socket");
@@ -28,15 +37,14 @@ app.use(session({
         sameSite : "none",
         httpOnly : production,
         secure : production,
-        maxAge : 6 * 60 * 60 * 1000,
-        domain : "cric-front.onrender.com"
+        maxAge : 6 * 60 * 60 * 1000
     }
 }));
 
 app.enable("trust proxy");
 
 app.use(cors({
-    origin : ["http://localhost:3001","https://cric-front.onrender.com"],
+    origin : origins,
     credentials : true
 }))
 

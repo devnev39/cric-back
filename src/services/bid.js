@@ -50,7 +50,6 @@ module.exports = {
             }
             delete b.dPlayers;
             delete b.cPlayers;
-            b.Teams.forEach(t => console.log(t.Players));
             if(req.io) await req.io.emit(req.params.auction_id, b);
             return {status : 200, data : a};
         },ERRCODE);

@@ -76,19 +76,27 @@ module.exports = {
             const update = {
                 '$unset' : obj
             }
-            console.log(update);
-            console.log(filter);
-            console.log(req.body.player);
             await auction.updateOne(filter, update);
 
-            for(let team of a.Teams){
-                if(team._id == req.body.player.team_id){
-                    _.remove(team.Players,(obj) => obj._id == req.body.player._id)
-                    team.Current += req.body.player.SoldPrice;
-                }
+            filter = {
+                "Teams._id" : mongoose.Types.ObjectId(req.body.player.team_id),
+                "Teams.Players._id" : mongoose.Types.ObjectId(req.body.player._id)
             }
-            await a.save();
-            b = JSON.parse(JSON.stringify(a));
+
+            // for(let team of a.Teams){
+            //     if(team._id == req.body.player.team_id){
+            //         _.remove(team.Players,(obj) => obj._id == req.body.player._id)
+            //         team.Current += req.body.player.SoldPrice;
+            //     }
+            // }
+            let b = await auction.updateOne(filter, {
+                $pull : {
+                    'Teams.$.Players': { _id: `${req.body.player._id}` }
+                }
+            })
+            // b = JSON.parse(JSON.stringify(a));
+            // if(b != a) throw new Error("Saved document doesn't match !");
+            console.log(a.Teams);
             b.Teams.forEach(team => {
                 console.log(team);
                 team.Players = team.Players.map(player => {
@@ -100,6 +108,8 @@ module.exports = {
             })
             delete b.dPlayers;
             delete b.cPlayers;
+            delete b.password;
+            delete a.password;
             if(req.io) await req.io.emit(req.params.auction_id, b);
             return {status : 200, data : a};
         },ERRCODE);

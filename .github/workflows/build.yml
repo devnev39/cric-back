@@ -24,6 +24,10 @@ jobs :
       uses : docker/build-push-action@v4
       with :
         context : .
+        platforms : linux/amd64
         file : ./Dockerfile
         push : true
         tags : ${{ secrets.DOCKER_USERNAME }}/cric-mvc:latest
+
+    - name : Deploy latest build
+      run : curl ${{ secrets.DEPLOY_URL }}

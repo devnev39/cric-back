@@ -1,7 +1,9 @@
 name : Docker Build
 
 on : 
-  push : [production]
+  push : 
+    branches : 
+      - production
 
 jobs :
   docker-build:

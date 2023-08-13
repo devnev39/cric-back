@@ -14,13 +14,20 @@ jobs :
     - name : Login to docker hub
       uses : docker/login-action@v2
       with : 
-        username : ${{ secrets.DOCKERHUB_USERNAME }}
-        password : ${{ secrets.DOCKERHUB_PASS }}
+        username : ${{ secrets.DOCKER_USERNAME }}
+        password : ${{ secrets.DOCKERHUB_TOKEN }}
 
     - name : Set docker build
       uses : docker/setup-buildx-action@v2
+
+    - name : Build and push
+      uses : docker/build-push-action@v4
       with :
         context : .
+        platforms : linux/amd64
         file : ./Dockerfile
         push : true
-        tags : ${{ secrets.DOCKERHUB_USERNAME }}/cric-mvc
+        tags : ${{ secrets.DOCKER_USERNAME }}/cric-mvc:latest
+
+    - name : Deploy latest build
+      run : curl ${{ secrets.DEPLOY_URL }}

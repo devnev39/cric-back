@@ -9,7 +9,7 @@ if(process.env.MONGO == 'LOCAL') MONGO_URI = "mongodb://127.0.0.1:27017/cric-mvc
 try {
     mongoose.connect(MONGO_URI);
     const PORT = process.env.PORT || 3000;
-    app.listen(PORT,() => {console.log(`Sever started on ${PORT}`)});
+   app.listen(PORT,() => {console.log(`Sever started on ${PORT}`)});
 } catch (error) {
     console.log(error);
 }

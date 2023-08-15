@@ -39,7 +39,7 @@ module.exports = {
                     team.Current -= req.body.bid.amt;
                 }
             }
-            
+            a.Status = 'orange'; 
             await a.save();
             a = await auction.findById(req.params.auction_id);
             b = JSON.parse(JSON.stringify(a));
@@ -96,13 +96,14 @@ module.exports = {
             })
             // b = JSON.parse(JSON.stringify(a));
             // if(b != a) throw new Error("Saved document doesn't match !");
-            console.log(a.Teams);
+
+            //console.log(a.Teams);
             b.Teams.forEach(team => {
-                console.log(team);
+             //   console.log(team);
                 team.Players = team.Players.map(player => {
                     // console.log()
                     // console.log(_.filter(a[setDataset], dplayer => dplayer.__id == player.__id));
-                    console.log(player);
+              //      console.log(player);
                     return _.filter(a[setDataset], (dplayer) => dplayer._id == player._id)[0]
                 });
             })

@@ -10,6 +10,13 @@ module.exports.player = {
     IMGURL : "url"
 }
 
+module.exports.tempUser = {
+    Name : "text",
+    Email : "email",
+    Expiry : "date",
+    Enabled : "checkbox"
+}
+
 module.exports.team = {
     Name : "text",
     Budget : "number"

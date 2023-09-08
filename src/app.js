@@ -10,12 +10,12 @@ const production = process.env.NODE_ENV === 'production';
 const app = express();
 const server = require("http").createServer(app);
 
-const origins = ["http://localhost:3001","https://cric-front.onrender.com","http://192.168.0.107:3001","https://cric-front.ddnsking.com"];
+const origins = ["http://localhost:3000","https://cric-front.onrender.com","http://192.168.0.107:3001","https://cric-front.ddnsking.com"];
 
 const io = require("socket.io")(server, {
     cors : {
         origin : origins,
-        method : ["GET","POST"],
+        method : ["*"],
         credentials : true
     }
 });
@@ -49,8 +49,11 @@ app.use(cors({
 }))
 
 app.use((err,req,res,next) => {
-    if(err){ res.json({status : 500,data : err}); }
-    else next();
+    if (err) {
+      res.json({status : 500,data : err});
+    } else {
+      next();
+    }
 });
 
 app.use((req,res,next) => {

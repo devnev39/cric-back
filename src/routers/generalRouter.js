@@ -26,6 +26,9 @@ router.route("/auction")
 .get(middlewares.authenticatedAuctionFilter,routes.auction.get)
 .post(middlewares.auctionFilter,routes.auction.post)
 
+router.route("/admin")
+.get(middlewares.authenticateAdminFilter)
+
 router.get("/logout",routes.auths.logoutAuction);
 
 module.exports = router;

@@ -3,8 +3,10 @@ const mongoose = require("mongoose");
 
 const app = require("./src/app");
 
-let MONGO_URI = process.env.MONGO_URI
-if(process.env.MONGO == 'LOCAL') MONGO_URI = "mongodb://127.0.0.1:27017/cric-mvc"
+let {MONGO_URI} = process.env
+if (process.env.MONGO == 'LOCAL') {
+  MONGO_URI = "mongodb://127.0.0.1:27017/cric-mvc"
+}
 
 try {
     mongoose.connect(MONGO_URI);

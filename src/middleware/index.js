@@ -4,5 +4,6 @@ module.exports = middlewares = {
     teamFilter : require("./teamFilter"),
     auctionFilter : require("./auctionFilter"),
     queryFilter : require("./queryFilter"),
-    authenticatedAuctionFilter : require("./authenticatedAuctionFilter")
+    authenticatedAuctionFilter : require("./authenticatedAuctionFilter"),
+    authenticateAdminFilter : require("./authenticatedAdminFilter")
 };

@@ -14,7 +14,9 @@ module.exports = {
         return await utils.trywrapper(async () => {
             const a = await Auction.findById(req.params.auction_id);
             const setDataset = a.poolingMethod == "Composite" ? "dPlayers" : "cPlayers";
-            if(!req.body.team.No) req.body.team.No = a.Teams.length + 1;
+            if (!req.body.team.No) {
+              req.body.team.No = a.Teams.length + 1;
+            }
             req.body.team.Current = req.body.team.Budget;
             req.body.team.AuctionMaxBudget = a.MaxBudget;
             const t = new Team(req.body.team);
@@ -28,7 +30,9 @@ module.exports = {
                     return _.filter(a[setDataset], dplayer => dplayer._id == player._id)[0];
                 });
             }
-            if(req.io) await req.io.emit(req.params.auction_id, b);
+            if (req.io) {
+              await req.io.emit(req.params.auction_id, b);
+            }
             return {status : 200, data : a};
         },ERRORCODE);
     },
@@ -37,9 +41,13 @@ module.exports = {
             const a = await Auction.findById(req.params.auction_id);
             const setDataset = a.poolingMethod == "Composite" ? "dPlayers" : "cPlayers";
             let ind = 0;
-            for(let team of a.Teams) if(team._id == req.params.team_id) ind = a.Teams.indexOf(team);
+            for(let team of a.Teams) if (team._id == req.params.team_id) {
+                                       ind = a.Teams.indexOf(team);
+                                     }
             a.Teams.pull({_id : req.params.team_id});
-            for(let team of a.Teams) if(team.No > ind+1) team.No -= 1
+            for(let team of a.Teams) if (team.No > ind+1) {
+                                       team.No -= 1
+                                     }
             await a.save();
             b = JSON.parse(JSON.stringify(a));
             b.cPlayers = null;
@@ -49,7 +57,9 @@ module.exports = {
                     return _.filter(a[setDataset], dplayer => dplayer._id == player._id)[0];
                 });
             }
-            if(req.io) await req.io.emit(req.params.auction_id, b);
+            if (req.io) {
+              await req.io.emit(req.params.auction_id, b);
+            }
             return {status : 200};
         },ERRORCODE);
     },
@@ -77,7 +87,9 @@ module.exports = {
                     return _.filter(a[setDataset], dplayer => dplayer._id == player._id)[0];
                 });
             }
-            if(req.io) await req.io.emit(req.params.auction_id, b);
+            if (req.io) {
+              await req.io.emit(req.params.auction_id, b);
+            }
             return {status : 200, data : a};
         },ERRORCODE);
     }

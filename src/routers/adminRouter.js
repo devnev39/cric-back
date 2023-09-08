@@ -6,6 +6,13 @@ const routes = require("../routes/adminRouter/index");
 const middlewares = require("../middleware/index");
 const router = express.Router();
 
+router.route("/users")
+.get(middlewares.auth.adminAuth, routes.user.get)
+.post(middlewares.auth.adminAuth, routes.user.post)
+
+router.route("/users/:user_id")
+.put(middlewares.auth.adminAuth, routes.user.put)
+.delete(middlewares.auth.adminAuth, routes.user.delete)
 // router.use(fileUpload());
 
 // router.use(middlewares.auth.adminAuth);

@@ -14,7 +14,9 @@ module.exports = {
     },
     addAuction : async (auctionJson) => {
         return await trywrapper(async () => {
-            if(!auctionJson.No) auctionJson.No = await Auction.countDocuments()+1;
+            if (!auctionJson.No) {
+              auctionJson.No = await Auction.countDocuments()+1;
+            }
             auctionJson.Status = "red";
             auctionJson.poolingMethod = "Composite";
             auctionJson.Password = await bcrypt.hash(decrypt.decrypt(auctionJson.Password),5);

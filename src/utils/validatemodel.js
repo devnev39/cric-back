@@ -27,15 +27,21 @@ module.exports.playerValidatorWimodel = (playerJson,neglect) => {
 const checkObjectForKeys = (model,param) => {
     let result = "Parameter not found !";
     for(let key of Object.keys(model.schema.obj)){
-        if(key == param) result = true;
+        if (key == param) {
+          result = true;
+        }
     }
     return result;
 }
 
 module.exports.queryValidator = (queryJson,queryModel,neglect) => {
     let result = validatormessagewrapper(jsonValidator,queryJson,queryJsonSchema,neglect);
-    if(result != true) return result;
-    if(queryJson.group) return result;
+    if (result != true) {
+      return result;
+    }
+    if (queryJson.group) {
+      return result;
+    }
     result = checkObjectForKeys(queryModel,queryJson.param);
     return result;
 }

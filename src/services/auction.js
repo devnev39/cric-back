@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const player = require("../models/player");
 const { filterObject, trywrapper, decrypt, error } = require("../utils/index");
 const { publicAuctionViewModel } = require("../models/wimodels");
-const { newAuctionAdminAuth } = require("../utils/auctionAdminAuth");
+const { newAuctionAdminAuth, deleteAuctionAuth } = require("../utils/auctionAdminAuth");
 const ERRORCODE = 400;
 module.exports = {
     getAuction : async () => {
@@ -39,6 +39,9 @@ module.exports = {
     },
     deleteAuction : async (auctionJson) => {
         return await trywrapper(async () => {
+            const result = await deleteAuctionAuth(auctionJson.deleteId);
+            if(!result){throw new Error("Delete admin id incorrect !");}
+            auctionJson = auctionJson.auction;
             await Auction.findByIdAndDelete(auctionJson._id);
             await Auction.updateMany({No : {$gt : auctionJson.No}},{$inc : {No : -1}});
             return {status : 200};

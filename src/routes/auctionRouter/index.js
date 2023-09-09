@@ -17,7 +17,7 @@ module.exports = {
         },ERRORCODE);
     },req,res),
     updateAuction : async (req,res) => await utils.resultwrapper(updateAuction,req,res,req.body.auction),
-    deleteAuction : async (req,res) => await utils.resultwrapper(deleteAuction,req,res,req.body.auction),
+    deleteAuction : async (req,res) => await utils.resultwrapper(deleteAuction,req,res,req.body),
     teams : teams,
     players : players,
     bid : bid,

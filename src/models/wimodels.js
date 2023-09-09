@@ -25,7 +25,8 @@ module.exports.team = {
 module.exports.auction = {
     Name : "text",
     MaxBudget : "number",
-    Password : "password"
+    Password : "password",
+    Adminid : "password"
 }
 
 module.exports.publicAuctionViewModel = {

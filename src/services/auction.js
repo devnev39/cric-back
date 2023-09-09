@@ -1,8 +1,9 @@
 const Auction = require("../models/auction");
 const bcrypt = require("bcrypt");
 const player = require("../models/player");
-const { filterObject, trywrapper, decrypt } = require("../utils/index");
+const { filterObject, trywrapper, decrypt, error } = require("../utils/index");
 const { publicAuctionViewModel } = require("../models/wimodels");
+const { newAuctionAdminAuth } = require("../utils/auctionAdminAuth");
 const ERRORCODE = 400;
 module.exports = {
     getAuction : async () => {
@@ -14,6 +15,10 @@ module.exports = {
     },
     addAuction : async (auctionJson) => {
         return await trywrapper(async () => {
+            const result = await newAuctionAdminAuth(auctionJson);
+            if(!result){
+                throw new Error("Admin ID incorrect !");
+            }
             if (!auctionJson.No) {
               auctionJson.No = await Auction.countDocuments()+1;
             }

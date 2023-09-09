@@ -1,6 +1,7 @@
 const express = require("express");
 const middlewares = require("../middleware/index");
 const routes = require("../routes/generalRouter/index");
+const teamRoutes = require("../routes/auctionRouter/teams")
 
 const router = express.Router();
 
@@ -18,6 +19,9 @@ router.route("/player/query")
 
 router.route("/team/query")
 .post(middlewares.queryFilter.teamQueryFilter,routes.queries.teamsq)
+
+router.route("/teams/:teamId")
+.get(teamRoutes.getTeam)
 
 router.route("/auction/query")
 .post(middlewares.queryFilter.auctionQueryFilter,routes.queries.auctionq)

@@ -2,12 +2,21 @@ const _ = require("lodash");
 const Auction = require("../models/auction");
 const Team = require("../models/team");
 const utils = require("../utils/index");
+const auction = require("../models/auction");
+const { default: mongoose } = require("mongoose");
 const ERRORCODE = 420;
 module.exports = {
-    getTeam : async () => {
+    getTeam : async (req) => {
         return await utils.trywrapper(async () => {
-            const result = await Team.find();
-            return {status : 200, data : result};
+            const id = req.params.teamId;
+            const auction = await Auction.find({"Teams.Key" : id})
+            let Team = null;
+            for(let team of auction[0].Teams){
+                if(team.Key == id){
+                    Team = team;
+                }
+            }
+            return {status : 200, data : Team};
         },ERRORCODE);
     },
     addTeam : async (req) => {
@@ -19,6 +28,7 @@ module.exports = {
             }
             req.body.team.Current = req.body.team.Budget;
             req.body.team.AuctionMaxBudget = a.MaxBudget;
+            req.body.team.Key = crypto.randomBytes(3).toString("hex");
             const t = new Team(req.body.team);
             a.Teams.push(t);
             await a.save();

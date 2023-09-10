@@ -1,20 +1,28 @@
 const _ = require("lodash");
+const crypto = require("crypto");
 const Auction = require("../models/auction");
 const Team = require("../models/team");
 const utils = require("../utils/index");
-const auction = require("../models/auction");
-const { default: mongoose } = require("mongoose");
 const ERRORCODE = 420;
 module.exports = {
     getTeam : async (req) => {
         return await utils.trywrapper(async () => {
             const id = req.params.teamId;
-            const auction = await Auction.find({"Teams.Key" : id})
+            let a = await Auction.find({"Teams.Key" : id})
+            a = a[0];
+            const setDataset = a.poolingMethod == "Composite" ? "dPlayers" : "cPlayers";
             let Team = null;
-            for(let team of auction[0].Teams){
+            for(let team of a.Teams){
                 if(team.Key == id){
                     Team = team;
                 }
+            }
+            // const b = JSON.parse(JSON.stringify(a));
+            Team = JSON.parse(JSON.stringify(Team));
+            if(Team){
+                Team.Players = Team.Players.map(player => {
+                    return _.filter(a[setDataset], dplayer => dplayer._id == player._id)[0];
+                });
             }
             return {status : 200, data : Team};
         },ERRORCODE);

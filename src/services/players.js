@@ -75,7 +75,7 @@ module.exports = {
 				const player = new Player(req.body.player);
 				a.Add.push(player);
 			}else{
-				throw new Error("player | players object not found !");
+				throw new Error("player(s) object not found !");
 			}
 			await a.save();
 			return {status : 200};

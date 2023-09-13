@@ -7,7 +7,10 @@ module.exports.player = {
     BasePrice : "number",
     IPL2022Team : "text",
     AuctionedPrice : "number",
-    IMGURL : "url"
+    IMGURL : "url",
+    TotalRuns: "number",
+    BattingAvg: "number",
+    StrikeRate: "number"
 }
 
 module.exports.tempUser = {

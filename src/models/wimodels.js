@@ -10,7 +10,9 @@ module.exports.player = {
     IMGURL : "url",
     TotalRuns: "number",
     BattingAvg: "number",
-    StrikeRate: "number"
+    StrikeRate: "number",
+    Wickets: "number",
+    Economy: "number"
 }
 
 module.exports.tempUser = {

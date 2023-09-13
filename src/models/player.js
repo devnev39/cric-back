@@ -13,6 +13,8 @@ const playerSchema = mongoose.Schema({
     TotalRuns: Number,
     BattingAvg: Number,
     StrikeRate: Number,
+    Wickets: Number,
+    Economy: Number,
     IMGURL : String,
     Edited : Boolean,
     SOLD : String,

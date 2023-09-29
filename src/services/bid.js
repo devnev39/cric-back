@@ -6,27 +6,38 @@ const { trywrapper } = require("../utils");
 const team = require("../models/team");
 const ERRCODE = 701;
 
+const getSoldPlayerQuery = (setDataset, auction_id, bid, reset=false) => {
+    let filter = {_id : mongoose.Types.ObjectId(auction_id)};
+    const dataset = `${setDataset}._id`;
+    filter[dataset] = mongoose.Types.ObjectId(bid.player._id);
+
+    const soldPriceParameter = `${setDataset}.$.SoldPrice`;
+    const soldParameter = `${setDataset}.$.SOLD`;
+    const teamParam = `${setDataset}.$.team_id`;
+    let update = {}
+    update[soldPriceParameter] = reset ? 1 : bid.amt;
+    update[soldParameter] = reset ? 1 : bid.team.Name;
+    update[teamParam] = reset ? 1 : bid.team._id;
+    return {update, filter};
+}
+
 module.exports = {
     placeBid : async (req) => {
         return await trywrapper(async () => {
             let a = await auction.findById(req.params.auction_id);
-            let update = {};
             
             const setDataset = a.poolingMethod == "Composite" ? "dPlayers" : "cPlayers";
-            let filter = {_id : mongoose.Types.ObjectId(req.params.auction_id)};
-            const dataset = `${setDataset}._id`;
-            filter[dataset] = mongoose.Types.ObjectId(req.body.bid.player._id);
+            let {update, filter} = getSoldPlayerQuery(setDataset, req.params.auction_id, req.body.bid);
 
-            const soldPriceParameter = `${setDataset}.$.SoldPrice`;
-            const soldParameter = `${setDataset}.$.SOLD`;
-            const teamParam = `${setDataset}.$.team_id`;
-
-            update[soldPriceParameter] = req.body.bid.amt;
-            update[soldParameter] = req.body.bid.team.Name;
-            update[teamParam] = req.body.bid.team._id;
-
-            await auction.updateOne(filter,{"$set" : update});
-            
+            let result = await auction.updateOne(filter,{"$set" : update});
+            console.log("BID query result : ",result);
+            if(!result.modifiedCount && !result.matchedCount){
+                let {update, filter} = getSoldPlayerQuery("Add", req.params.auction_id, req.body.bid);     
+                result = await auction.updateOne(filter, {"$set": update});
+                if(!result.modifiedCount && !result.matchedCount){
+                    throw new Error("Player not found in any dataset !")
+                }
+            } 
             req.body.bid.player.SOLD = req.body.bid.team.Name;
             req.body.bid.player.SoldPrice = req.body.bid.amt;
             req.body.bid.player.team_id = req.body.bid.team._id;
@@ -43,13 +54,16 @@ module.exports = {
             
             await a.save();
             a = await auction.findById(req.params.auction_id);
+            a[setDataset] = a[setDataset].concat(a["Add"]);
             b = JSON.parse(JSON.stringify(a));
             for(let team of b.Teams){
                 team.Players = team.Players.map(player => {
                     return _.filter(a[setDataset], dplayer => dplayer._id == player._id)[0];
                 });
                 if(team.Key == team_key){
-                    req.io.emit(team.Key, team);
+                    if(a.AllowPublicTeamView){
+                        req.io.emit(team.Key, team);
+                    }   
                 }
             }
             if (req.io) {
@@ -67,21 +81,16 @@ module.exports = {
             */
             let a = await auction.findById(req.params.auction_id);
 
-            const setDataset = a.poolingMethod == "Composite" ? "dPlayers" : "cPlayers";
-            let filter = {_id : mongoose.Types.ObjectId(req.params.auction_id)};
-            const dataset = `${setDataset}._id`;
-            filter[dataset] = mongoose.Types.ObjectId(req.body.player._id);
-
-            obj = {}
-            obj[`${setDataset}.$.SoldPrice`] = 1
-            obj[`${setDataset}.$.SOLD`] = 1
-            obj[`${setDataset}.$.team_id`] = 1
-
-            const update = {
-                '$unset' : obj
+            let setDataset = a.poolingMethod == "Composite" ? "dPlayers" : "cPlayers";
+            let {update, filter} = getSoldPlayerQuery(setDataset, req.params.auction_id, req.body, true) 
+            let result = await auction.updateOne(filter, {"$unset": update});
+            if(!result.matchedCount && !result.modifiedCount){
+                let {update, filter} = getSoldPlayerQuery("Add", req.params.auction_id, req.body, true);
+                result = await auction.updateOne(filter, {"$unset": update});
+                if(!result.matchedCount && !result.modifiedCount){
+                    throw new Error("Player object not found !");
+                }
             }
-            await auction.updateOne(filter, update);
-
             filter = {
                 "Teams._id" : mongoose.Types.ObjectId(req.body.player.team_id),
                 "Teams.Players._id" : mongoose.Types.ObjectId(req.body.player._id)
@@ -102,14 +111,13 @@ module.exports = {
             }
             await b.save();
             a = await auction.findById(req.params.auction_id);
+            a[setDataset] = a[setDataset].concat(a.Add);
             b = JSON.parse(JSON.stringify(b))
             b.Teams.forEach(team => {
                 team.Players = team.Players.map(player => {
                     return _.filter(a[setDataset], dplayer => dplayer._id == player._id)[0]
                 });
-                if(team.Key == team_key){
-                    req.io.emit(team.Key, team);
-                }
+                 
             })
             b.password = undefined;
             a.password = undefined;

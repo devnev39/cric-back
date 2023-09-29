@@ -10,6 +10,12 @@ module.exports = {
             const id = req.params.teamId;
             let a = await Auction.find({"Teams.Key" : id})
             a = a[0];
+            if(!a){
+                throw new Error("Auction not found !");
+            }
+            if(!a.AllowPublicTeamView){
+                throw new Error("Live feed disabled !");
+            }
             const setDataset = a.poolingMethod == "Composite" ? "dPlayers" : "cPlayers";
             let Team = null;
             for(let team of a.Teams){

@@ -24,6 +24,8 @@ module.exports = {
             }
             auctionJson.Status = "red";
             auctionJson.poolingMethod = "Composite";
+            auctionJson.MaxPlayser = 11;
+            auctionJson.AllowPublicTeamView = true;
             auctionJson.Password = await bcrypt.hash(decrypt.decrypt(auctionJson.Password),5);
             const a = new Auction(auctionJson);
             a.dPlayers = await player.find();

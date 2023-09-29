@@ -10,6 +10,8 @@ const auctionShema = mongoose.Schema({
     Password : String,
     Status : String,
     poolingMethod : String,
+    MaxPlayers: Number,
+    AllowPublicTeamView: Boolean,
     Rules : [Rule.schema],
     Teams : [Team.schema],
     Add : [player.schema],

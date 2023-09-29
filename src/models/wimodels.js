@@ -31,7 +31,9 @@ module.exports.auction = {
     Name : "text",
     MaxBudget : "number",
     Password : "password",
-    Adminid : "password"
+    Adminid : "password",
+    MaxPlayers: "Number",
+    AllowPublicTeamView: "checkbox"
 }
 
 module.exports.publicAuctionViewModel = {

@@ -63,6 +63,7 @@ module.exports = {
         return await utils.trywrapper(async () => {
 			const a = await auction.findById(req.params.auction_id);
 			let srno = getSrno(a);
+			let player = null;
 			if(req.body.players){
 				for(let p of req.body.players){
 					p.SRNO = ++srno;
@@ -72,13 +73,13 @@ module.exports = {
 			}else
 			if(req.body.player){
 				req.body.player.SRNO = ++srno;
-				const player = new Player(req.body.player);
+				player = new Player(req.body.player);
 				a.Add.push(player);
 			}else{
 				throw new Error("player(s) object not found !");
 			}
 			await a.save();
-			return {status : 200};
+			return {status : 200, data: player, mergeTo: "Add"};
 		},ERRORCODE)
     },
 	deletePlayer : async (req) => {
@@ -100,11 +101,11 @@ module.exports = {
 			let player = null;
 			let dataset = a.poolingMethod=="Composite" ? "dPlayers" : "cPlayers";
 			for(let p of a.dPlayers) if (p._id == req.body.player._id) {
-                              player = p;
-                            }
+				player = p;
+            }
 			if (!player) {
-     for(let p of a.Add) if(p._id == req.body.player._id) {player = p;dataset="Add"}
-   };
+     			for(let p of a.Add) if(p._id == req.body.player._id) {player = p;dataset="Add"}
+   			}
 			console.log(player,dataset);
 			a[dataset].pull({_id : req.body.player._id});
 			a[dataset].push(req.body.player);

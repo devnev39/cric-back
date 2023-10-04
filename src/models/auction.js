@@ -3,7 +3,7 @@ const player = require("./player");
 const Team = require("./team");
 const Rule = require("./rule");
 
-const auctionShema = mongoose.Schema({
+const auctionSchema = mongoose.Schema({
     No : Number,
     Name : String,
     MaxBudget : Number,
@@ -20,4 +20,4 @@ const auctionShema = mongoose.Schema({
     cPlayers : [player.schema]
 });
 
-module.exports = mongoose.model("Auction",auctionShema);
+module.exports = mongoose.model("Auction",auctionSchema);

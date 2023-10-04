@@ -6,15 +6,15 @@ const ERRORCODE = 410;
 
 const getSrno = (a) => {
 	let srno = 0;
-	if (a.dPlayers.length) {
-   srno = a.dPlayers[a.dPlayers.length-1].SRNO;
- }
-	if (a.Add.length && a.Add[a.Add.length-1].SRNO > srno) {
-       srno = a.Add[a.Add.length-1].SRNO
- }
-	if (a.cPlayers.length && a.cPlayers[a.cPlayers.length-1].SRNO > srno) {
-       srno = a.cPlayers[a.cPlayers.length-1].SRNO
- }
+	if (a.dPlayers.length && a.poolingMethod == "Composite") {
+  		srno = a.dPlayers.length + 1;
+ 	}
+	if (a.Add.length && a.poolingMethod == "Composite") {
+		srno += a.Add.length + 1;
+ 	}
+	if (a.cPlayers.length && a.poolingMethod == "Custom") {
+		srno = a.cPlayers.length + 1;
+ 	}
 	return srno;
 }
 

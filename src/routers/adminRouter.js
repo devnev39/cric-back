@@ -10,6 +10,13 @@ router.route("/users")
 .get(middlewares.auth.adminAuth, routes.user.get)
 .post(middlewares.auth.adminAuth, routes.user.post)
 
+router.route("/admin/auctions")
+.get(middlewares.auth.adminAuth, routes.auction.get)
+
+router.route("/admin/auctions/:auction_id")
+.put(middlewares.auth.adminAuth, routes.auction.put)
+.delete(middlewares.auth.adminAuth, routes.auction.delete)
+
 router.route("/users/:user_id")
 .put(middlewares.auth.adminAuth, routes.user.put)
 .delete(middlewares.auth.adminAuth, routes.user.delete)

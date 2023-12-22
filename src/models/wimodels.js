@@ -44,6 +44,17 @@ module.exports.publicAuctionViewModel = {
     Status : "text"
 }
 
+module.exports.AuctionViewModelAdmin = {
+    _id: "text",
+    Name: "text",
+    MaxBudget: "number",
+    No : "number",
+    Status: "text",
+    MaxPlayers: "Number",
+    AllowPublicTeamView: "checkbox",
+    AllowLogin: "checkbox"
+}
+
 module.exports.PlayerRuleModel = {
     BasePrice : "number",
     AuctionedPrice : "number",

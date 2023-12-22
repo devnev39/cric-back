@@ -18,7 +18,12 @@ module.exports = {
             req.session.isAuctionAuthenticated = false;
             req.session.authenticatedAuctionId = undefined;
             res.json({status : 200});
-          } else {
+          } else 
+          if (req.session.isAdminAuthenticated) {
+            req.session.isAdminAuthenticated = false;
+            res.json({status: 200});
+          }
+          else {
             res.json({status : 510,data : "No authenticated auction !"});
           }
         }

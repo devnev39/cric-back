@@ -11,8 +11,15 @@ module.exports = {
             const pass = decrypt.decrypt(req.body.Password);
             const result = await bcrypt.compare(pass, a.Password);
             if (result && req.session) {
-              req.session.isAuctionAuthenticated = result;
-              req.session.authenticatedAuctionId = req.body._id;
+              if(req.session.isAdminAuthenticated) {
+                throw new Error("Cannot give admin access without logging out from admin panel !")
+              }
+              if(a.AllowLogin){
+                req.session.isAuctionAuthenticated = result;
+                req.session.authenticatedAuctionId = req.body._id;
+              }else{
+                throw new Error("Login blocked by admin !")
+              }
             }
             if (result) {
               return { status: 200 };

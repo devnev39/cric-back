@@ -7,7 +7,8 @@ const modelDictionary = {
     'auction' : webInputModels.auction,
     "PlayerRuleModel" : webInputModels.PlayerRuleModel,
     "TeamRuleModel" : webInputModels.TeamRuleModel,
-    "tempUser" : webInputModels.tempUser
+    "tempUser" : webInputModels.tempUser,
+    "AuctionViewModelAdmin": webInputModels.AuctionViewModelAdmin
 }
 module.exports =  (req,res) => {
     if(Object.keys(modelDictionary).indexOf(req.params.model) == -1){utils.error(res,ERRORCODE,"Requested model not found in dictionary !");return;}

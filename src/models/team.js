@@ -1,15 +1,15 @@
-const mongoose = require("mongoose");
-const Player = require("./soldPlayer");
+const mongoose = require('mongoose');
+const Player = require('./soldPlayer');
 
 const teamSchema = mongoose.Schema({
-    No : Number,
-    Name : String,
-    Budget : Number,
-    Current : Number,
-    Key : String,
-    AuctionMaxBudget : Number,
-    Players : {type : [Player.schema]},
-    Score : Number
+  No: Number,
+  Name: String,
+  Budget: Number,
+  Current: Number,
+  Key: String,
+  AuctionMaxBudget: Number,
+  Players: {type: [Player.schema]},
+  Score: Number,
 });
 
-module.exports = mongoose.model("Team",teamSchema);
+module.exports = mongoose.model('Team', teamSchema);

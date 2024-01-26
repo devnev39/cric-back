@@ -19,5 +19,8 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 'latest',
   },
-  rules: {},
+  rules: {
+    'max-len': 'off',
+    'new-cap': 'off',
+  },
 };

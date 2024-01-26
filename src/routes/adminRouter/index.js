@@ -1,7 +1,7 @@
 module.exports = {
-    home : require("./home"),
-    players : require("./players"),
-    teams : require("./teams"),
-    auction : require("./auction"),
-    user : require("./users")
+  home: require('./home'),
+  players: require('./players'),
+  teams: require('./teams'),
+  auction: require('./auction'),
+  user: require('./users'),
 };

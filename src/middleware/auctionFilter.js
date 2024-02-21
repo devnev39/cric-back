@@ -9,7 +9,7 @@ const auctionFilter = async (req, res, next) => {
     error(res, ERRORCODE, 'No auction object provided !');
     return;
   }
-  if (req.body.auction.MaxBudget < 0 || req.body.auction.MaxBudget > 11000) {
+  if (req.body.auction.maxBudget < 0 || req.body.auction.maxBudget > 11000) {
     error(res, ERRORCODE, 'Invalid auction budget !');
     return;
   }

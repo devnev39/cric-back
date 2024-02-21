@@ -4,19 +4,20 @@ const utils = require('../utils/index');
 const {playerValidatorWimodel} = require('../utils/validatemodel');
 const ERRORCODE = 410;
 
-const getSrno = (a) => {
-  let srno = 0;
-  if (a.dPlayers.length && a.poolingMethod == 'Composite') {
-    srno = a.dPlayers.length + 1;
-  }
-  if (a.Add.length && a.poolingMethod == 'Composite') {
-    srno += a.Add.length + 1;
-  }
-  if (a.cPlayers.length && a.poolingMethod == 'Custom') {
-    srno = a.cPlayers.length + 1;
-  }
-  return srno;
-};
+// TODO: evaluate use cases for srno field
+// const getSrno = (a) => {
+//   let srno = 0;
+//   if (a.dPlayers.length && a.poolingMethod == 'Composite') {
+//     srno = a.dPlayers.length + 1;
+//   }
+//   if (a.Add.length && a.poolingMethod == 'Composite') {
+//     srno += a.Add.length + 1;
+//   }
+//   if (a.cPlayers.length && a.poolingMethod == 'Custom') {
+//     srno = a.cPlayers.length + 1;
+//   }
+//   return srno;
+// };
 
 module.exports = {
   getPlayers: async (req) => {
@@ -24,15 +25,15 @@ module.exports = {
       const a = await auction.findById(req.params.auction_id);
       const resp = {};
       if (a.poolingMethod == 'Composite') {
-        resp.Main = a.dPlayers;
-        resp.Add = a.Add;
-        resp.Rmv = a.Rmv;
-        resp.Sup = a.Sup;
+        resp.main = a.dPlayers;
+        resp.add = a.add;
+        resp.rmv = a.rmv;
+        resp.sup = a.sup;
       } else if (a.poolingMethod == 'Custom') {
-        resp.Main = a.cPlayers;
-        resp.Add = a.Add;
-        resp.Rmv = a.Rmv;
-        resp.Sup = a.Sup;
+        resp.main = a.cPlayers;
+        resp.add = a.add;
+        resp.rmv = a.rmv;
+        resp.sup = a.sup;
       }
       return {status: 200, data: resp};
     }, ERRORCODE);
@@ -40,10 +41,10 @@ module.exports = {
   uploadPlayers: async (req) => {
     return await utils.trywrapper(async () => {
       const a = await auction.findById(req.params.auction_id);
-      let srno = getSrno(a);
+      // let srno = getSrno(a);
       for (const p of req.body.players) {
-        p.SRNO = ++srno;
-        if ((valid = playerValidatorWimodel(p, ['IMGURL'])) != true) {
+        // p.SRNO = ++srno;
+        if ((valid = playerValidatorWimodel(p, ['imgUrl'])) != true) {
           throw new Error(valid);
         }
         const player = new Player(p);
@@ -62,18 +63,18 @@ module.exports = {
   addPlayers: async (req) => {
     return await utils.trywrapper(async () => {
       const a = await auction.findById(req.params.auction_id);
-      let srno = getSrno(a);
+      // let srno = getSrno(a); // TODO: solve the srno issue
       let player = null;
       if (req.body.players) {
         for (const p of req.body.players) {
-          p.SRNO = ++srno;
+          // p.SRNO = ++srno;
           const player = new Player(p);
-          a.Add.push(player);
+          a.add.push(player);
         }
       } else if (req.body.player) {
-        req.body.player.SRNO = ++srno;
+        // req.body.player.SRNO = ++srno;
         player = new Player(req.body.player);
-        a.Add.push(player);
+        a.add.push(player);
       } else {
         throw new Error('player(s) object not found !');
       }
@@ -85,7 +86,7 @@ module.exports = {
     return await utils.trywrapper(async () => {
       const a = await auction.findById(req.params.auction_id);
       if (!req.body.src && !req.body.dest) {
-        a.Rmv.pull({_id: req.body.player._id});
+        a.rmv.pull({_id: req.body.player._id});
       } else {
         throw new Error('DELETE method conditions not satisfied !');
       }
@@ -95,7 +96,7 @@ module.exports = {
   },
   updatePlayer: async (req) => {
     return await utils.trywrapper(async () => {
-      req.body.player.Edited = true;
+      req.body.player.edited = true;
       const a = await auction.findById(req.params.auction_id);
       let player = null;
       let dataset = a.poolingMethod == 'Composite' ? 'dPlayers' : 'cPlayers';
@@ -105,17 +106,17 @@ module.exports = {
         }
       }
       if (!player) {
-        for (const p of a.Add) {
+        for (const p of a.add) {
           if (p._id == req.body.player._id) {
             player = p;
-            dataset = 'Add';
+            dataset = 'add';
           }
         }
       }
       console.log(player, dataset);
       a[dataset].pull({_id: req.body.player._id});
       a[dataset].push(req.body.player);
-      a[dataset].sort((a, b) => a.SRNO - b.SRNO);
+      // a[dataset].sort((a, b) => a.SRNO - b.SRNO);
       await a.save();
       const resp = await auction.findById(req.params.auction_id);
       return {status: 200, data: resp};
@@ -150,7 +151,7 @@ module.exports = {
       }
       a[src].pull({_id: req.body.player._id});
       a[dest].push(player);
-      a[dest].sort((a, b) => a.SRNO - b.SRNO);
+      // a[dest].sort((a, b) => a.SRNO - b.SRNO);
       await a.save();
       return {status: 200};
     }, ERRORCODE);

@@ -8,15 +8,15 @@ module.exports = {
   _auctionAuth: async (req, res) => {
     const response = await trywrapper(async () => {
       const a = await auction.findById(req.body._id);
-      const pass = decrypt.decrypt(req.body.Password);
-      const result = await bcrypt.compare(pass, a.Password);
+      const pass = decrypt.decrypt(req.body.password);
+      const result = await bcrypt.compare(pass, a.password);
       if (result && req.session) {
         if (req.session.isAdminAuthenticated) {
           throw new Error(
               'Cannot give admin access without logging out from admin panel !',
           );
         }
-        if (a.AllowLogin) {
+        if (a.allowLogin) {
           req.session.isAuctionAuthenticated = result;
           req.session.authenticatedAuctionId = req.body._id;
         } else {

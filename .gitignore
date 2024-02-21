@@ -2,3 +2,4 @@ cric-front/
 node_modules/
 .DS_Store
 app.test.js
+*.drawio

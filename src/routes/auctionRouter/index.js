@@ -14,7 +14,7 @@ module.exports = {
         async () => {
           return utils.trywrapper(async () => {
             const a = await auction.findById(req.params.auction_id);
-            a.Password = undefined;
+            a.password = undefined;
             return {status: 200, data: a};
           }, ERRORCODE);
         },

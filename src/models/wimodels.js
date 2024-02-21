@@ -1,18 +1,18 @@
 module.exports.player = {
-  Name: 'text',
-  Country: 'text',
-  PlayingRole: 'text',
-  IPLMatches: 'number',
-  CUA: 'text',
-  BasePrice: 'number',
-  IPL2022Team: 'text',
-  AuctionedPrice: 'number',
-  IMGURL: 'url',
-  TotalRuns: 'number',
-  BattingAvg: 'number',
-  StrikeRate: 'number',
-  Wickets: 'number',
-  Economy: 'number',
+  name: 'text',
+  country: 'text',
+  playingRole: 'text',
+  iplMatches: 'number',
+  cua: 'text',
+  basePrice: 'number',
+  ipl2022Team: 'text',
+  auctionedPrice: 'number',
+  imgUrl: 'url',
+  totalRuns: 'number',
+  battingAvg: 'number',
+  strikeRate: 'number',
+  wickets: 'number',
+  economy: 'number',
 };
 
 module.exports.tempUser = {
@@ -37,22 +37,20 @@ module.exports.auction = {
 };
 
 module.exports.publicAuctionViewModel = {
-  Name: 'text',
-  MaxBudget: 'number',
-  No: 'number',
+  name: 'text',
+  maxBudget: 'number',
   _id: 'text',
-  Status: 'text',
+  status: 'text',
 };
 
 module.exports.AuctionViewModelAdmin = {
   _id: 'text',
-  Name: 'text',
-  MaxBudget: 'number',
-  No: 'number',
-  Status: 'text',
-  MaxPlayers: 'Number',
-  AllowPublicTeamView: 'checkbox',
-  AllowLogin: 'checkbox',
+  name: 'text',
+  maxBudget: 'number',
+  status: 'text',
+  maxPlayers: 'Number',
+  allowPublicTeamView: 'checkbox',
+  allowLogin: 'checkbox',
 };
 
 module.exports.PlayerRuleModel = {

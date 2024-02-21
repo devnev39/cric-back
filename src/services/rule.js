@@ -15,13 +15,16 @@ module.exports = {
         throw new Error('Rule not found !');
       }
       const rule = new Rule(req.body.rule);
-      a.Rules.push(rule);
+      a.rules.push(rule);
       await a.save();
+
+      // TODO: write comment about the need and working of this copying
+
       const b = JSON.parse(JSON.stringify(a));
       b.dPlayers = null;
       b.dPlayers = null;
-      for (const team of b.Teams) {
-        team.Players = team.Players.map((player) => {
+      for (const team of b.teams) {
+        team.players = team.players.map((player) => {
           return _.filter(
               a[setDataset],
               (dplayer) => dplayer._id == player._id,
@@ -43,13 +46,16 @@ module.exports = {
       if (!req.body.rule) {
         throw new Error('Rule not found !');
       }
-      a.Rules.pull({_id: req.body.rule._id});
+      a.rules.pull({_id: req.body.rule._id});
       await a.save();
+
+      // TODO: write comment about the need and working of this copying
+
       b = JSON.parse(JSON.stringify(a));
       b.cPlayers = null;
       b.dPlayers = null;
       for (const team of b.Teams) {
-        team.Players = team.Players.map((player) => {
+        team.players = team.players.map((player) => {
           return _.filter(
               a[setDataset],
               (dplayer) => dplayer._id == player._id,

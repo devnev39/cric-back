@@ -39,10 +39,6 @@ module.exports = {
 
   deleteAuctionAdmin: async (auctionJson) => {
     await Auction.findByIdAndDelete(auctionJson._id);
-    await Auction.updateMany(
-        {No: {$gt: auctionJson.No}},
-        {$inc: {No: -1}},
-    );
     let auctions = await Auction.find();
     auctions = auctions.map((a) => filterObject(a, AuctionViewModelAdmin));
     return {status: 200, data: auctions};
@@ -54,16 +50,13 @@ module.exports = {
       if (!result) {
         throw new Error('Admin ID incorrect !');
       }
-      if (!auctionJson.No) {
-        auctionJson.No = (await Auction.countDocuments()) + 1;
-      }
-      auctionJson.Status = 'red';
+      auctionJson.status = 'red';
       auctionJson.poolingMethod = 'Composite';
-      auctionJson.MaxPlayser = 11;
-      auctionJson.AllowPublicTeamView = true;
-      auctionJson.AllowLogin = true;
-      auctionJson.Password = await bcrypt.hash(
-          decrypt.decrypt(auctionJson.Password),
+      auctionJson.maxPlayers = 11;
+      auctionJson.allowPublicTeamView = true;
+      auctionJson.allowLogin = true;
+      auctionJson.password = await bcrypt.hash(
+          decrypt.decrypt(auctionJson.password),
           5,
       );
       const a = new Auction(auctionJson);
@@ -86,10 +79,6 @@ module.exports = {
       }
       auctionJson = auctionJson.auction;
       await Auction.findByIdAndDelete(auctionJson._id);
-      await Auction.updateMany(
-          {No: {$gt: auctionJson.No}},
-          {$inc: {No: -1}},
-      );
       return {status: 200};
     }, ERRORCODE);
   },

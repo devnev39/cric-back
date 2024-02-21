@@ -16,8 +16,8 @@ module.exports = {
 
   addUser: async (req) => {
     return await trywrapper(async () => {
-      req.body.tempUser.PAT = crypto.randomBytes(48).toString('hex');
-      req.body.tempUser.Enabled = true;
+      req.body.tempUser.pat = crypto.randomBytes(48).toString('hex');
+      req.body.tempUser.enabled = true;
       const user = new tempUser(req.body.tempUser);
       await user.save();
       const users = await tempUser.find();

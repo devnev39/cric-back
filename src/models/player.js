@@ -1,25 +1,26 @@
 const mongoose = require('mongoose');
 
 const playerSchema = mongoose.Schema({
-  SRNO: Number,
-  Name: String,
-  Country: String,
-  PlayingRole: String,
-  IPLMatches: Number,
-  CUA: String,
-  BasePrice: Number,
-  IPL2022Team: String,
-  AuctionedPrice: Number,
-  TotalRuns: Number,
-  BattingAvg: Number,
-  StrikeRate: Number,
-  Wickets: Number,
-  Economy: Number,
-  IMGURL: String,
-  Edited: Boolean,
-  SOLD: String,
+  srno: Number,
+  name: String,
+  country: String,
+  playingRole: String,
+  iplMatches: Number,
+  cua: String, // Capped uncapped
+  basePrice: Number,
+  ipl2022Team: String,
+  auctionedPrice: Number,
+  totalRuns: Number,
+  battingAvg: Number,
+  strikeRate: Number,
+  wickets: Number,
+  economy: Number,
+  imgUrl: String,
+  edited: Boolean,
+  sold: Boolean,
   SoldPrice: Number,
   team_id: String,
+  teamName: String,
 });
 
 module.exports = mongoose.model('Player', playerSchema);

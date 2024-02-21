@@ -4,21 +4,20 @@ const Team = require('./team');
 const Rule = require('./rule');
 
 const auctionSchema = mongoose.Schema({
-  No: Number,
-  Name: String,
-  MaxBudget: Number,
-  Password: String,
-  Status: String,
+  name: String,
+  maxBudget: Number,
+  password: String,
+  status: String,
   poolingMethod: String,
-  MaxPlayers: Number,
-  AllowPublicTeamView: Boolean,
-  AllowLogin: Boolean,
-  Rules: [Rule.schema],
-  Teams: [Team.schema],
-  Add: [player.schema],
-  Rmv: [player.schema],
-  dPlayers: [player.schema],
-  cPlayers: [player.schema],
+  maxPlayers: Number,
+  allowPublicTeamView: Boolean,
+  allowLogin: Boolean,
+  rules: [Rule.schema],
+  teams: [Team.schema],
+  add: [player.schema],
+  rmv: [player.schema],
+  dPlayers: [player.schema], // Default players
+  cPlayers: [player.schema], // Custom players
 });
 
 module.exports = mongoose.model('Auction', auctionSchema);

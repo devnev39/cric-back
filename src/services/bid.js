@@ -10,12 +10,12 @@ const getSoldPlayerQuery = (setDataset, auctionId, bid, reset = false) => {
   const dataset = `${setDataset}._id`;
   filter[dataset] = mongoose.Types.ObjectId(bid.player._id);
 
-  const soldPriceParameter = `${setDataset}.$.SoldPrice`;
-  const soldParameter = `${setDataset}.$.SOLD`;
+  const soldPriceParameter = `${setDataset}.$.soldPrice`;
+  const soldParameter = `${setDataset}.$.sold`;
   const teamParam = `${setDataset}.$.team_id`;
   const update = {};
   update[soldPriceParameter] = reset ? 1 : bid.amt;
-  update[soldParameter] = reset ? 1 : bid.team.Name;
+  update[soldParameter] = reset ? 1 : bid.team.name;
   update[teamParam] = reset ? 1 : bid.team._id;
   return {update, filter};
 };
@@ -37,7 +37,7 @@ module.exports = {
       console.log('BID query result : ', result);
       if (!result.modifiedCount && !result.matchedCount) {
         const {update, filter} = getSoldPlayerQuery(
-            'Add',
+            'add',
             req.params.auction_id,
             req.body.bid,
         );
@@ -46,34 +46,34 @@ module.exports = {
           throw new Error('Player not found in any dataset !');
         }
       }
-      req.body.bid.player.SOLD = req.body.bid.team.Name;
-      req.body.bid.player.SoldPrice = req.body.bid.amt;
+      req.body.bid.player.sold = req.body.bid.team.name;
+      req.body.bid.player.soldPrice = req.body.bid.amt;
       req.body.bid.player.team_id = req.body.bid.team._id;
       let teamKey = null;
       for (const team of a.Teams) {
         if (team._id == req.body.bid.team._id) {
           const p = new player(req.body.bid.player);
-          team.Players.push(p);
-          team.Current -= req.body.bid.amt;
-          teamKey = team.Key || null;
+          team.players.push(p);
+          team.currentBudget -= req.body.bid.amt;
+          teamKey = team.key || null;
         }
       }
-      a.Status = 'orange';
+      a.status = 'orange';
 
       await a.save();
       a = await auction.findById(req.params.auction_id);
-      a[setDataset] = a[setDataset].concat(a['Add']);
+      a[setDataset] = a[setDataset].concat(a['add']);
       b = JSON.parse(JSON.stringify(a));
-      for (const team of b.Teams) {
-        team.Players = team.Players.map((player) => {
+      for (const team of b.teams) {
+        team.players = team.players.map((player) => {
           return _.filter(
               a[setDataset],
               (dplayer) => dplayer._id == player._id,
           )[0];
         });
-        if (team.Key == teamKey) {
-          if (a.AllowPublicTeamView) {
-            req.io.emit(team.Key, team);
+        if (team.key == teamKey) {
+          if (a.allowPublicTeamView) {
+            req.io.emit(team.key, team);
           }
         }
       }
@@ -103,7 +103,7 @@ module.exports = {
       let result = await auction.updateOne(filter, {$unset: update});
       if (!result.matchedCount && !result.modifiedCount) {
         const {update, filter} = getSoldPlayerQuery(
-            'Add',
+            'add',
             req.params.auction_id,
             req.body,
             true,
@@ -114,37 +114,37 @@ module.exports = {
         }
       }
       filter = {
-        'Teams._id': mongoose.Types.ObjectId(req.body.player.team_id),
-        'Teams.Players._id': mongoose.Types.ObjectId(req.body.player._id),
+        'teams._id': mongoose.Types.ObjectId(req.body.player.team_id),
+        'teams.players._id': mongoose.Types.ObjectId(req.body.player._id),
       };
       await auction.updateOne(filter, {
         $pull: {
-          'Teams.$.Players': {_id: `${req.body.player._id}`},
+          'teams.$.players': {_id: `${req.body.player._id}`},
         },
       });
       let b = await auction.findById(req.params.auction_id);
       let teamKey = null;
-      for (const team of b.Teams) {
+      for (const team of b.teams) {
         if (team._id == req.body.player.team_id) {
-          _.remove(team.Players, (obj) => obj._id == req.body.player._id);
-          team.Current += req.body.player.SoldPrice;
-          teamKey = team.Key || null;
+          _.remove(team.players, (obj) => obj._id == req.body.player._id);
+          team.currentBudget += req.body.player.soldPrice;
+          teamKey = team.key || null;
         }
       }
       await b.save();
       a = await auction.findById(req.params.auction_id);
-      a[setDataset] = a[setDataset].concat(a.Add);
+      a[setDataset] = a[setDataset].concat(a.add);
       b = JSON.parse(JSON.stringify(b));
-      b.Teams.forEach((team) => {
-        team.Players = team.Players.map((player) => {
+      b.teams.forEach((team) => {
+        team.players = team.players.map((player) => {
           return _.filter(
               a[setDataset],
               (dplayer) => dplayer._id == player._id,
           )[0];
         });
-        if (team.Key == teamKey) {
-          if (a.AllowPublicTeamView) {
-            req.io.emit(team.Key, team);
+        if (team.key == teamKey) {
+          if (a.allowPublicTeamView) {
+            req.io.emit(team.key, team);
           }
         }
       });

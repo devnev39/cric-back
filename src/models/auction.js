@@ -17,7 +17,7 @@ const auctionSchema = mongoose.Schema({
   add: [player.schema],
   rmv: [player.schema],
   dPlayers: [player.schema], // Default players
-  cPlayers: [player.schema], // Custom players
+  cPlayers: [player.schema], // Custom players uploaded by user
 });
 
 module.exports = mongoose.model('Auction', auctionSchema);

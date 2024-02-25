@@ -1,3 +1,4 @@
+const DocumentNotFoundError = require('../errors/documentNotFound');
 const auctionPlayers = require('../models/auctionPlayers');
 const Player = require('../models/player');
 const utils = require('../utils/index');
@@ -25,19 +26,6 @@ module.exports = {
       const auctionPlayersObject = await auctionPlayers.find({
         auctionId: req.params.auctionId,
       });
-      // const a = await auction.findById(req.params.auction_id);
-      // const resp = {};
-      // if (a.poolingMethod == 'Composite') {
-      //   resp.main = a.dPlayers;
-      //   resp.add = a.add;
-      //   resp.rmv = a.rmv;
-      //   resp.sup = a.sup;
-      // } else if (a.poolingMethod == 'Custom') {
-      //   resp.main = a.cPlayers;
-      //   resp.add = a.add;
-      //   resp.rmv = a.rmv;
-      //   resp.sup = a.sup;
-      // }
       return {status: 200, data: auctionPlayersObject};
     }, ERRORCODE);
   },
@@ -100,26 +88,43 @@ module.exports = {
   },
   updatePlayer: async (req) => {
     return await utils.trywrapper(async () => {
-      req.body.player.edited = true;
+      // req.body.player
+      // req.body.datasetProperties
+
       let auctionPlayersObject = await auctionPlayers.find({
         auctionId: req.params.auctionId,
       });
       if (auctionPlayersObject.length) {
         auctionPlayersObject = auctionPlayersObject[0];
-      } else throw new Error('No auction players object found !');
+      } else throw new DocumentNotFoundError();
 
-      let res = auctionPlayersObject.defaultPlayers.filter((p) => {
-        return p._id == req.body.player._id;
-      });
+      let res;
 
-      if (res.length) {
-        res = res[0];
-      } else throw new Error('No player found with this id !');
+      if (req.body.player) {
+        // Update the player
+        req.body.player.edited = true;
 
-      Object.keys(req.body.player).forEach((key) => {
-        res[key] = req.body.player[key];
-      });
-      await auctionPlayersObject.save();
+        res = auctionPlayersObject.defaultPlayers.filter((p) => {
+          return p._id == req.body.player._id;
+        });
+
+        if (res.length) {
+          res = res[0];
+        } else throw new DocumentNotFoundError();
+
+        Object.keys(req.body.player).forEach((key) => {
+          res[key] = req.body.player[key];
+        });
+        await auctionPlayersObject.save();
+      }
+
+      if (req.body.datasetProperties) {
+        // Update the dataset propeties
+        Object.keys(req.body.datasetProperties).forEach((key) => {
+          auctionPlayersObject[key] = req.body.datasetProperties[key];
+        });
+        await auctionPlayersObject.save();
+      }
       return {status: 200, data: res};
     }, ERRORCODE);
   },

@@ -43,16 +43,13 @@ router
     .copy(middlewares.auth.auctionAuth, routes.players.uploadPlayers);
 
 router
-    .route('/auction/:auction_id/bid')
+    .route('/auction/:auctionId/bid')
     .post(middlewares.auth.auctionAuth, routes.bid.placeBid)
     .delete(middlewares.auth.auctionAuth, routes.bid.revertBid);
 
 router
     .route('/rule/:auctionId')
-    .get(middlewares.auth.auctionAuth, routes.rule.getRules);
-
-router
-    .route('/rule/:ruleId')
+    .get(middlewares.auth.auctionAuth, routes.rule.getRules)
     .delete(middlewares.auth.auctionAuth, routes.rule.deleteRule);
 
 router.route('/rule').post(middlewares.auth.auctionAuth, routes.rule.addRule);

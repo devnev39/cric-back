@@ -18,7 +18,7 @@ const playerSchema = mongoose.Schema({
   imgUrl: String,
   edited: Boolean,
   sold: Boolean,
-  SoldPrice: Number,
+  soldPrice: Number,
   team_id: String,
   teamName: String,
 });

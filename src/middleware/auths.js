@@ -11,7 +11,10 @@ module.exports = {
     }
   },
   auctionAuth: (req, res, next) => {
-    if (!req.session.isAuctionAuthenticated) {
+    if (
+      !req.session.isAuctionAuthenticated &&
+      process.env.APISECURE == 'TRUE'
+    ) {
       res.json({
         status: 510,
         data: 'Incorrect credentials',

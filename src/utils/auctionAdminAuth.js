@@ -3,8 +3,8 @@ const {decrypt} = require('.');
 const bcrypt = require('bcrypt');
 
 module.exports = {
-  newAuctionAdminAuth: async (auctionJson) => {
-    const key = decrypt.decrypt(auctionJson.Adminid);
+  newAuctionAdminAuth: async (adminId) => {
+    const key = decrypt.decrypt(adminId);
     const result = await bcrypt.compare(key, process.env.ADMINID);
     return result;
   },

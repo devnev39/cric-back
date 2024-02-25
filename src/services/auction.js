@@ -1,6 +1,6 @@
 const Auction = require('../models/auction');
 const bcrypt = require('bcrypt');
-const player = require('../models/player');
+const Player = require('../models/player');
 const {filterObject, trywrapper, decrypt} = require('../utils/index');
 const {
   publicAuctionViewModel,
@@ -10,6 +10,7 @@ const {
   newAuctionAdminAuth,
   deleteAuctionAuth,
 } = require('../utils/auctionAdminAuth');
+const auctionPlayers = require('../models/auctionPlayers');
 const ERRORCODE = 400;
 module.exports = {
   getAuction: async () => {
@@ -46,10 +47,12 @@ module.exports = {
 
   addAuction: async (auctionJson) => {
     return await trywrapper(async () => {
-      const result = await newAuctionAdminAuth(auctionJson);
+      // Check the admin id
+      const result = await newAuctionAdminAuth(auctionJson.adminId);
       if (!result) {
         throw new Error('Admin ID incorrect !');
       }
+      auctionJson = auctionJson.auction;
       auctionJson.status = 'red';
       auctionJson.poolingMethod = 'Composite';
       auctionJson.maxPlayers = 11;
@@ -59,16 +62,31 @@ module.exports = {
           decrypt.decrypt(auctionJson.password),
           5,
       );
-      const a = new Auction(auctionJson);
-      a.dPlayers = await player.find();
-      await a.save();
-      return {status: 200};
+      auctionJson.maxBudget = auctionJson.maxBudget ?
+        auctionJson.maxBudget :
+        1000;
+      // Deletion of code - issue 14 - Database changes
+      // moving from embeded document structure to separate collection structure
+      // removed array fields from the auction object namely players, rules, teams
+      const auction = new Auction(auctionJson);
+      const players = await Player.find();
+      const auctionPlayersObject = new auctionPlayers({
+        auctionId: auction._id,
+        defaultPlayers: players,
+      });
+      await auctionPlayersObject.save();
+      await auction.save();
+      return {
+        status: 200,
+        data: filterObject(auction, publicAuctionViewModel),
+      };
     }, ERRORCODE);
   },
   updateAuction: async (auctionJson) => {
     return await trywrapper(async () => {
       await Auction.findByIdAndUpdate(auctionJson._id, auctionJson);
-      return {status: 200};
+      const auction = await Auction.findById(auctionJson._id);
+      return {status: 200, data: auction};
     }, ERRORCODE);
   },
   deleteAuction: async (auctionJson) => {

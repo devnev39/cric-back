@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Player = require('./soldPlayer');
 
 const teamSchema = mongoose.Schema({
+  auctionId: String,
   name: String,
   budget: Number,
   currentBudget: Number,

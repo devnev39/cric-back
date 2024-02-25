@@ -2,7 +2,7 @@
 
 const ERRORCODE = 300;
 const error = require('../utils/error');
-const Auction = require('../models/auction');
+// const Auction = require('../models/auction');
 
 const auctionFilter = async (req, res, next) => {
   if (!req.body.auction) {
@@ -13,11 +13,11 @@ const auctionFilter = async (req, res, next) => {
     error(res, ERRORCODE, 'Invalid auction budget !');
     return;
   }
-  const result = await Auction.find({No: req.body.auction.No});
-  if (result.length) {
-    error(res, ERRORCODE, 'Auction object with given No. exist !');
-    return;
-  }
+  // const result = await Auction.find({No: req.body.auction.No});
+  // if (result.length) {
+  //   error(res, ERRORCODE, 'Auction object with given No. exist !');
+  //   return;
+  // }
   next();
 };
 

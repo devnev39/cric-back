@@ -22,7 +22,7 @@ module.exports = {
         res,
     ),
   updateAuction: async (req, res) =>
-    await utils.resultwrapper(updateAuction, req, res, req.body.auction),
+    await utils.resultwrapper(updateAuction, req, res, req.body),
   deleteAuction: async (req, res) =>
     await utils.resultwrapper(deleteAuction, req, res, req.body),
   teams: teams,

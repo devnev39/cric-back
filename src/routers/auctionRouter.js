@@ -12,7 +12,8 @@ router
     .delete(middlewares.auth.auctionAuth, routes.deleteAuction);
 
 router
-    .route('/auction/:auction_id/teams')
+    .route('/team')
+    .get(middlewares.auth.auctionAuth, routes.teams.getAllTeams)
     .post(
         middlewares.auth.auctionAuth,
         middlewares.teamFilter,
@@ -20,7 +21,7 @@ router
     );
 
 router
-    .route('/auction/:auction_id/teams/:team_id')
+    .route('/team/:teamId')
     .delete(middlewares.auth.auctionAuth, routes.teams.deleteTeam)
     .put(
         middlewares.auth.auctionAuth,
@@ -29,7 +30,11 @@ router
     );
 
 router
-    .route('/auction/:auction_id/players')
+    .route('/team/auction/:auctionId')
+    .get(middlewares.auth.auctionAuth, routes.teams.getAllAuctionTeams);
+
+router
+    .route('/auction/:auctionId/players')
     .get(middlewares.auth.auctionAuth, routes.players.getPlayers)
     .post(middlewares.auth.auctionAuth, routes.players.addPlayers)
     .patch(middlewares.auth.auctionAuth, routes.players.movePlayers)
@@ -43,8 +48,13 @@ router
     .delete(middlewares.auth.auctionAuth, routes.bid.revertBid);
 
 router
-    .route('/auction/:auction_id/rule')
-    .post(middlewares.auth.auctionAuth, routes.rule.addRule)
+    .route('/rule/:auctionId')
+    .get(middlewares.auth.auctionAuth, routes.rule.getRules);
+
+router
+    .route('/rule/:ruleId')
     .delete(middlewares.auth.auctionAuth, routes.rule.deleteRule);
+
+router.route('/rule').post(middlewares.auth.auctionAuth, routes.rule.addRule);
 
 module.exports = router;

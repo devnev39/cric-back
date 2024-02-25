@@ -132,14 +132,14 @@ module.exports = {
       // req.body.destination
       // req.body.player
 
-      const auctionPlayersObject = await auctionPlayers.find({
+      let auctionPlayersObject = await auctionPlayers.find({
         auctionId: req.params.auctionId,
       });
       if (auctionPlayersObject.length) {
         auctionPlayersObject = auctionPlayersObject[0];
       } else throw new Error('No auction players object found !');
 
-      const player = auctionPlayersObject[req.body.source].filter(
+      let player = auctionPlayersObject[req.body.source].filter(
           (p) => p._id == req.body.player._id,
       );
       if (player.length) {
@@ -149,7 +149,7 @@ module.exports = {
       auctionPlayersObject[req.body.source].pull({_id: req.body.player._id});
       auctionPlayersObject[req.body.destination].push(player);
 
-      await auctionPlayers.save();
+      await auctionPlayersObject.save();
       return {status: 200};
     }, ERRORCODE);
   },

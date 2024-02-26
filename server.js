@@ -10,18 +10,20 @@ import('chalk').then(({default: chalk}) => {
   }
 
   if (process.env.APISECURE == 'FALSE' && process.env.ENV == 'production') {
-    console.log(chalk.red('WARNING: APISECURE set to FALSE in production !'));
+    console.log(
+        chalk.red('WARNING: APISECURE set to FALSE in production ☢️ ☣️ 🔓!'),
+    );
   } else if (process.env.APISECURE == 'FALSE') {
-    console.log(chalk.yellow('WARNING: APISECURE set to FALSE !'));
+    console.log(chalk.yellow('WARNING: APISECURE set to FALSE 🔓 !'));
   } else {
-    console.log(chalk.green('INFO: APISECURE set to TRUE !'));
+    console.log(chalk.green('INFO: APISECURE set to TRUE 🔐 !'));
   }
 
   try {
     mongoose.connect(MONGO_URI);
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => {
-      console.log(`Sever started on ${PORT}`);
+      console.log(`Sever started on ${PORT} 🎉🎉🎉`);
     });
   } catch (error) {
     console.log(error);

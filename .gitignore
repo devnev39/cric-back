@@ -4,3 +4,4 @@ node_modules/
 app.test.js
 *.drawio
 *.mdb.js
+.env

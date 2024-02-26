@@ -1,4 +1,5 @@
 const utils = require('../../utils');
+const ERRCODE = 510;
 module.exports = {
   auctionAuth: async (req, res) => {
     // Decrypt password
@@ -20,12 +21,16 @@ module.exports = {
       ) {
         req.session.isAuctionAuthenticated = false;
         req.session.authenticatedAuctionId = undefined;
-        res.json({status: 200});
+        res.json({status: true});
       } else if (req.session.isAdminAuthenticated) {
         req.session.isAdminAuthenticated = false;
-        res.json({status: 200});
+        res.json({status: true});
       } else {
-        res.json({status: 510, data: 'No authenticated auction !'});
+        res.json({
+          status: false,
+          errorCode: ERRCODE,
+          data: 'No authenticated auction !',
+        });
       }
     }
   },

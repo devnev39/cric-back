@@ -87,7 +87,7 @@ module.exports = {
 
       // TODO: Socket implementation
 
-      return {status: 200};
+      return {status: true};
     }, ERRCODE);
   },
 
@@ -139,7 +139,7 @@ module.exports = {
       await t.save();
       await auctionPlayersObject.save();
 
-      return {status: 200};
+      return {status: true};
     }, ERRCODE);
   },
 };

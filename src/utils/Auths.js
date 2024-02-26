@@ -4,6 +4,8 @@ const bcrypt = require('bcrypt');
 const decrypt = require('./decrypt');
 const trywrapper = require('./trywrapper');
 
+const ERRCODE = 510;
+
 module.exports = {
   _auctionAuth: async (req, res) => {
     const response = await trywrapper(async () => {
@@ -24,9 +26,13 @@ module.exports = {
         }
       }
       if (result) {
-        return {status: 200};
+        return {status: true};
       } else {
-        return {status: 510, data: 'Incorrect credintials !'};
+        return {
+          status: false,
+          errorCode: ERRCODE,
+          data: 'Incorrect credintials !',
+        };
       }
     }, 510);
     res.json(response);
@@ -53,11 +59,15 @@ module.exports = {
         throw new Error('Cookie error at server !');
       }
       if (result) {
-        return {status: 200};
+        return {status: true};
       } else {
-        return {status: 505, data: 'Incorrect credintials !'};
+        return {
+          status: false,
+          errorCode: ERRCODE,
+          data: 'Incorrect credintials !',
+        };
       }
-    }, 505);
+    }, ERRCODE);
     res.json(response);
   },
 };

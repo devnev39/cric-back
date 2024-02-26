@@ -16,12 +16,12 @@ module.exports = (req, res) => {
     return;
   }
   if (req.params.model == 'auction') {
-    res.json({status: 200, data: modelDictionary[req.params.model]});
+    res.json({status: true, data: modelDictionary[req.params.model]});
     return;
   } else if (req.session.isAuctionAuthenticated) {
-    res.json({status: 200, data: modelDictionary[req.params.model]});
+    res.json({status: true, data: modelDictionary[req.params.model]});
   } else if (req.session.isAdminAuthenticated) {
-    res.json({status: 200, data: modelDictionary[req.params.model]});
+    res.json({status: true, data: modelDictionary[req.params.model]});
   } else {
     console.log(req.session);
     utils.error(

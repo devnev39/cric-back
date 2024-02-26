@@ -6,7 +6,7 @@ const routes = require('../routes/auctionRouter/index');
 const router = express.Router();
 
 router
-    .route('/auction/:auction_id')
+    .route('/auction/:auctionId')
     .get(middlewares.auth.auctionAuth, routes.getAuction)
     .put(middlewares.auth.auctionAuth, routes.updateAuction)
     .delete(middlewares.auth.auctionAuth, routes.deleteAuction);

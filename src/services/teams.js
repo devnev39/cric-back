@@ -8,20 +8,20 @@ module.exports = {
   getAllAuctionTeams: async (req) => {
     return await utils.trywrapper(async () => {
       const teams = await Team.find({auctionId: req.params.auctionId});
-      return {status: 200, data: teams};
+      return {status: true, data: teams};
     }, ERRORCODE);
   },
   getAllTeams: async (req) => {
     return await utils.trywrapper(async () => {
       const teams = await Team.find({acutionId: req.params.auctionId});
-      return {status: 200, data: teams};
+      return {status: true, data: teams};
     }, ERRORCODE);
   },
   getTeam: async (req) => {
     return await utils.trywrapper(async () => {
       const team = Team.findById(req.params.teamId);
       if (team) {
-        return {status: 200, data: team};
+        return {status: true, data: team};
       }
       throw new Error('Team not found !');
     }, ERRORCODE);
@@ -36,13 +36,13 @@ module.exports = {
 
       // TODO: Redesign the socket data flow
 
-      return {status: 200, data: t};
+      return {status: true, data: t};
     }, ERRORCODE);
   },
   deleteTeam: async (req) => {
     return await utils.trywrapper(async () => {
       await Team.deleteOne({_id: req.params.teamId});
-      return {status: 200};
+      return {status: true};
     }, ERRORCODE);
   },
   updateTeam: async (req) => {
@@ -50,7 +50,7 @@ module.exports = {
       let team = await Team.findById(req.params.teamId);
       await team.update(req.body.team);
       team = await Team.findById(req.params.teamId);
-      return {status: 200, data: team};
+      return {status: true, data: team};
     }, ERRORCODE);
   },
 };

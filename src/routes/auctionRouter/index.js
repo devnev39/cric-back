@@ -13,9 +13,9 @@ module.exports = {
     await utils.resultwrapper(
         async () => {
           return utils.trywrapper(async () => {
-            const a = await auction.findById(req.params.auction_id);
+            const a = await auction.findById(req.params.auctionId);
             a.password = undefined;
-            return {status: 200, data: a};
+            return {status: true, data: a};
           }, ERRORCODE);
         },
         req,

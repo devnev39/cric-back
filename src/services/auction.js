@@ -17,7 +17,7 @@ module.exports = {
     return await trywrapper(async () => {
       let result = await Auction.find();
       result = result.map((a) => filterObject(a, publicAuctionViewModel));
-      return {status: 200, data: result};
+      return {status: true, data: result};
     });
   },
 
@@ -25,7 +25,7 @@ module.exports = {
     return await trywrapper(async () => {
       let result = await Auction.find();
       result = result.map((a) => filterObject(a, AuctionViewModelAdmin));
-      return {status: 200, data: result};
+      return {status: true, data: result};
     });
   },
 
@@ -34,7 +34,7 @@ module.exports = {
       await Auction.findByIdAndUpdate(auctionJson._id, auctionJson);
       let auctions = await Auction.find();
       auctions = auctions.map((a) => filterObject(a, AuctionViewModelAdmin));
-      return {status: 200, data: auctions};
+      return {status: true, data: auctions};
     }, ERRORCODE);
   },
 
@@ -42,7 +42,7 @@ module.exports = {
     await Auction.findByIdAndDelete(auctionJson._id);
     let auctions = await Auction.find();
     auctions = auctions.map((a) => filterObject(a, AuctionViewModelAdmin));
-    return {status: 200, data: auctions};
+    return {status: true, data: auctions};
   },
 
   addAuction: async (auctionJson) => {
@@ -77,7 +77,7 @@ module.exports = {
       await auctionPlayersObject.save();
       await auction.save();
       return {
-        status: 200,
+        status: true,
         data: filterObject(auction, publicAuctionViewModel),
       };
     }, ERRORCODE);
@@ -86,7 +86,7 @@ module.exports = {
     return await trywrapper(async () => {
       await Auction.findByIdAndUpdate(auctionJson._id, auctionJson);
       const auction = await Auction.findById(auctionJson._id);
-      return {status: 200, data: auction};
+      return {status: true, data: auction};
     }, ERRORCODE);
   },
   deleteAuction: async (auctionJson) => {
@@ -97,7 +97,7 @@ module.exports = {
       }
       auctionJson = auctionJson.auction;
       await Auction.findByIdAndDelete(auctionJson._id);
-      return {status: 200};
+      return {status: true};
     }, ERRORCODE);
   },
 };

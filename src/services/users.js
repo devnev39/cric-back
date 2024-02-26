@@ -8,7 +8,7 @@ module.exports = {
     return await trywrapper(async () => {
       const users = await tempUser.find();
       return {
-        status: 200,
+        status: true,
         data: users,
       };
     }, ERRORCODE);
@@ -22,7 +22,7 @@ module.exports = {
       await user.save();
       const users = await tempUser.find();
       return {
-        status: 200,
+        status: true,
         data: users,
       };
     }, ERRORCODE);
@@ -35,7 +35,7 @@ module.exports = {
           req.body.tempUser,
       );
       const users = await tempUser.find();
-      return {status: 200, data: users};
+      return {status: true, data: users};
     }, ERRORCODE);
   },
 
@@ -43,7 +43,7 @@ module.exports = {
     return await trywrapper(async () => {
       await tempUser.findByIdAndDelete(req.params.user_id);
       const users = await tempUser.find();
-      return {status: 200, data: users};
+      return {status: true, data: users};
     }, ERRORCODE);
   },
 };

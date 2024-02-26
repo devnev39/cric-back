@@ -8,7 +8,7 @@ module.exports = {
   getRules: async (req) => {
     return await trywrapper(async () => {
       const rules = await Rule.find({auctionId: req.params.auctionId});
-      return {status: 200, data: rules};
+      return {status: true, data: rules};
     }, ERRCODE);
   },
   addRule: async (req) => {
@@ -16,14 +16,14 @@ module.exports = {
       // Issue 14 - (devnev39/cric-front)
       const rule = new Rule(req.body.rule);
       await rule.save();
-      return {status: 200, data: rule};
+      return {status: true, data: rule};
     }, ERRCODE);
   },
 
   deleteRule: async (req) => {
     return await trywrapper(async () => {
       await Rule.deleteOne({_id: req.params.ruleId});
-      return {status: 200};
+      return {status: true};
     }, ERRCODE);
   },
 };

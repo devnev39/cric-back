@@ -26,7 +26,7 @@ module.exports = {
       const auctionPlayersObject = await auctionPlayers.find({
         auctionId: req.params.auctionId,
       });
-      return {status: 200, data: auctionPlayersObject};
+      return {status: true, data: auctionPlayersObject};
     }, ERRORCODE);
   },
   uploadPlayers: async (req) => {
@@ -45,7 +45,7 @@ module.exports = {
         auctionPlayersObject.customPlayers.push(player);
       }
       await auctionPlayersObject.save();
-      return {status: 200, data: auctionPlayersObject};
+      return {status: true, data: auctionPlayersObject};
     }, ERRORCODE);
   },
   addPlayers: async (req) => {
@@ -60,19 +60,19 @@ module.exports = {
         for (const p of req.body.players) {
           // p.SRNO = ++srno;
           const player = new Player(p);
-          auctionPlayerObject.add.push(player);
+          auctionPlayerObject.addedPlayers.push(player);
           players.push(player);
         }
       } else if (req.body.player) {
         // req.body.player.SRNO = ++srno;
         const player = new Player(req.body.player);
-        auctionPlayerObject.add.push(player);
+        auctionPlayerObject.addedPlayers.push(player);
         players.push(player);
       } else {
         throw new Error('player(s) object not found !');
       }
       await auctionPlayerObject.save();
-      return {status: 200, data: players, mergeTo: 'Add'};
+      return {status: true, data: players};
     }, ERRORCODE);
   },
   deletePlayer: async (req) => {
@@ -81,9 +81,9 @@ module.exports = {
         auctionId: req.params.auctionId,
       });
       // const a = await auction.findById(req.params.auction_id);
-      auctionPlayersObject.rmv.pull({_id: req.body.player._id});
+      auctionPlayersObject.removedPlayers.pull({_id: req.body.player._id});
       await auctionPlayersObject.save();
-      return {status: 200};
+      return {status: true};
     }, ERRORCODE);
   },
   updatePlayer: async (req) => {
@@ -125,7 +125,7 @@ module.exports = {
         });
         await auctionPlayersObject.save();
       }
-      return {status: 200, data: res};
+      return {status: true, data: res};
     }, ERRORCODE);
   },
   poolPlayers: async (req) => {
@@ -142,20 +142,20 @@ module.exports = {
       });
       if (auctionPlayersObject.length) {
         auctionPlayersObject = auctionPlayersObject[0];
-      } else throw new Error('No auction players object found !');
+      } else throw new DocumentNotFoundError();
 
       let player = auctionPlayersObject[req.body.source].filter(
           (p) => p._id == req.body.player._id,
       );
       if (player.length) {
         player = player[0];
-      } else throw new Error('No player found with this id !');
+      } else throw new DocumentNotFoundError();
 
       auctionPlayersObject[req.body.source].pull({_id: req.body.player._id});
       auctionPlayersObject[req.body.destination].push(player);
 
       await auctionPlayersObject.save();
-      return {status: 200};
+      return {status: true};
     }, ERRORCODE);
   },
 };

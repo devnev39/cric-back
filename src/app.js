@@ -60,7 +60,7 @@ app.use(
 
 app.use((err, req, res, next) => {
   if (err) {
-    res.json({status: 500, data: err});
+    res.json({status: false, data: err});
   } else {
     next();
   }
@@ -76,7 +76,7 @@ app.use(bodyParser.json());
 app.use([auctionRouter, generalRouter, adminRouter]);
 
 app.route('/*').get((req, res) => {
-  res.json({data: 'Not found !', status: 404});
+  res.status(404).send({data: 'Not found !'});
 });
 
 module.exports = server;

@@ -2,7 +2,8 @@ module.exports = {
   adminAuth: (req, res, next) => {
     if (!req.session.isAdminAuthenticated) {
       res.json({
-        status: 505,
+        status: false,
+        erroCode: 505,
         data: 'Incorrect credentials',
         POST: '/auth/admin',
       });
@@ -16,9 +17,10 @@ module.exports = {
       process.env.APISECURE == 'TRUE'
     ) {
       res.json({
-        status: 510,
+        status: false,
+        errorCode: 510,
         data: 'Incorrect credentials',
-        POST: `/auth/auction/${req.params.auction_id}`,
+        POST: `/auth/auction/${req.params.auctionId}`,
       });
     } else {
       next();

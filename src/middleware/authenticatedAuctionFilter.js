@@ -9,7 +9,7 @@ module.exports = async (req, res, next) => {
     ) {
       const a = await auction.findById(req.session.authenticatedAuctionId);
       a.password = undefined;
-      return {status: 601, data: a};
+      return {status: false, errorCode: 601, data: a};
     } else {
       return undefined;
     }

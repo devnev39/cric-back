@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 
+// Will have access to default player set in players collection
+
 const tempUserSchema = mongoose.Schema({
   email: String,
   name: String,

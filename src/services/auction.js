@@ -29,30 +29,30 @@ module.exports = {
     });
   },
 
-  updateAuctionAdmin: async (auctionJson) => {
+  updateAuctionAdmin: async (req) => {
     return await trywrapper(async () => {
-      await Auction.findByIdAndUpdate(auctionJson._id, auctionJson);
+      await Auction.findByIdAndUpdate(req.body.auction._id, auctionJson);
       let auctions = await Auction.find();
       auctions = auctions.map((a) => filterObject(a, AuctionViewModelAdmin));
       return {status: true, data: auctions};
     }, ERRORCODE);
   },
 
-  deleteAuctionAdmin: async (auctionJson) => {
-    await Auction.findByIdAndDelete(auctionJson._id);
+  deleteAuctionAdmin: async (req) => {
+    await Auction.findByIdAndDelete(req.body.auction._id);
     let auctions = await Auction.find();
     auctions = auctions.map((a) => filterObject(a, AuctionViewModelAdmin));
     return {status: true, data: auctions};
   },
 
-  addAuction: async (auctionJson) => {
+  addAuction: async (req) => {
     return await trywrapper(async () => {
       // Check the admin id
-      const result = await newAuctionAdminAuth(auctionJson.adminId);
+      const result = await newAuctionAdminAuth(req.body.adminId);
       if (!result) {
         throw new Error('Admin ID incorrect !');
       }
-      auctionJson = auctionJson.auction;
+      auctionJson = req.body.auction;
       auctionJson.status = 'red';
       auctionJson.poolingMethod = 'Composite';
       auctionJson.maxPlayers = 11;
@@ -82,21 +82,21 @@ module.exports = {
       };
     }, ERRORCODE);
   },
-  updateAuction: async (auctionJson) => {
+  updateAuction: async (req) => {
     return await trywrapper(async () => {
-      await Auction.findByIdAndUpdate(auctionJson._id, auctionJson);
-      const auction = await Auction.findById(auctionJson._id);
+      await Auction.findByIdAndUpdate(req.body.auction._id, req.body.auction);
+      const auction = await Auction.findById(req.body.auction._id);
       return {status: true, data: auction};
     }, ERRORCODE);
   },
-  deleteAuction: async (auctionJson) => {
+  deleteAuction: async (req) => {
     return await trywrapper(async () => {
-      const result = await deleteAuctionAuth(auctionJson.deleteId);
+      const result = await deleteAuctionAuth(req.body.deleteId);
       if (!result) {
         throw new Error('Delete admin id incorrect !');
       }
-      auctionJson = auctionJson.auction;
-      await Auction.findByIdAndDelete(auctionJson._id);
+      auctionJson = req.body.auction;
+      await Auction.findByIdAndDelete(req.body.auction._id);
       return {status: true};
     }, ERRORCODE);
   },

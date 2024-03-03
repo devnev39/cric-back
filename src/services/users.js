@@ -20,10 +20,9 @@ module.exports = {
       req.body.tempUser.enabled = true;
       const user = new tempUser(req.body.tempUser);
       await user.save();
-      const users = await tempUser.find();
       return {
         status: true,
-        data: users,
+        data: user,
       };
     }, ERRORCODE);
   },
@@ -34,16 +33,15 @@ module.exports = {
           req.body.tempUser._id,
           req.body.tempUser,
       );
-      const users = await tempUser.find();
-      return {status: true, data: users};
+      const user = await tempUser.findById(req.body.tempUser._id);
+      return {status: true, data: user};
     }, ERRORCODE);
   },
 
   removeUser: async (req) => {
     return await trywrapper(async () => {
       await tempUser.findByIdAndDelete(req.params.user_id);
-      const users = await tempUser.find();
-      return {status: true, data: users};
+      return {status: true};
     }, ERRORCODE);
   },
 };

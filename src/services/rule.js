@@ -22,7 +22,9 @@ module.exports = {
 
   deleteRule: async (req) => {
     return await trywrapper(async () => {
-      await Rule.deleteOne({_id: req.params.ruleId});
+      // req.params.auctionId as rule._id
+      const result = await Rule.deleteOne({_id: req.params.auctionId});
+      console.log(result);
       return {status: true};
     }, ERRCODE);
   },

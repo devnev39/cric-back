@@ -8,6 +8,7 @@ const auctionSchema = mongoose.Schema({
   maxPlayers: Number,
   allowPublicTeamView: Boolean,
   allowLogin: Boolean,
+  createdAt: Date,
 });
 
 module.exports = mongoose.model('Auction', auctionSchema);

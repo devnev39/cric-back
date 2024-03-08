@@ -5,7 +5,7 @@ const error = require('../utils/error');
 const ERRORCODE = 315;
 
 const commonFilter = (req, res, next, model) => {
-  if (!req.body.query) {
+  if (!req.body.queries) {
     error(res, ERRORCODE, 'Query object not found !');
     return;
   }

@@ -65,6 +65,7 @@ module.exports = {
       auctionJson.maxBudget = auctionJson.maxBudget ?
         auctionJson.maxBudget :
         1000;
+      auctionJson.createdAt = new Date();
       // Deletion of code - issue 14 - Database changes
       // moving from embeded document structure to separate collection structure
       // removed array fields from the auction object namely players, rules, teams

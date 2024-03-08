@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 
 const playerSchema = mongoose.Schema({
-  srno: Number,
   name: String,
   country: String,
   playingRole: String,
@@ -16,7 +15,9 @@ const playerSchema = mongoose.Schema({
   wickets: Number,
   economy: Number,
   imgUrl: String,
-  edited: Boolean,
+  isEdited: Boolean,
+  isAdded: Boolean,
+  includeInAuction: Boolean,
   sold: Boolean,
   soldPrice: Number,
   team_id: String,

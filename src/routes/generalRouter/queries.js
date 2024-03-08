@@ -8,7 +8,8 @@ module.exports = {
   playersq: async (req, res) => {
     await utils.resultwrapper(
         async () => {
-          return await queryRunner(player, req.body.query);
+        // queries = [{query: [], accessor: ""}, ....]
+          return await queryRunner(player, req.body.queries);
         },
         req,
         res,

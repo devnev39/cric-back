@@ -23,9 +23,12 @@ const ERRORCODE = 410;
 module.exports = {
   getPlayers: async (req) => {
     return await utils.trywrapper(async () => {
-      const auctionPlayersObject = await auctionPlayers.find({
+      let auctionPlayersObject = await auctionPlayers.find({
         auctionId: req.params.auctionId,
       });
+      if (auctionPlayersObject.length) {
+        auctionPlayersObject = auctionPlayersObject[0];
+      } else throw new DocumentNotFoundError();
       return {status: true, data: auctionPlayersObject};
     }, ERRORCODE);
   },
@@ -50,28 +53,44 @@ module.exports = {
   },
   addPlayers: async (req) => {
     return await utils.trywrapper(async () => {
-      const auctionPlayerObject = await auctionPlayers.find({
+      let auctionPlayersObject = await auctionPlayers.find({
         auctionId: req.params.auctionId,
       });
-      // const a = await auction.findById(req.params.auctionId);
+      if (auctionPlayersObject.length) {
+        auctionPlayersObject = auctionPlayersObject[0];
+      } else throw new DocumentNotFoundError();
+
       // let srno = getSrno(a); // TODO: solve the srno issue
+
       const players = [];
       if (req.body.players) {
         for (const p of req.body.players) {
-          // p.SRNO = ++srno;
+          p.isAdded = true;
+          p.includeInAuction = true;
+          p.isEdited = false;
           const player = new Player(p);
-          auctionPlayerObject.addedPlayers.push(player);
+          if (auctionPlayersObject.useCustom) {
+            auctionPlayersObject.customPlayers.push(player);
+          } else {
+            auctionPlayersObject.players.push(player);
+          }
           players.push(player);
         }
       } else if (req.body.player) {
-        // req.body.player.SRNO = ++srno;
+        req.body.player.isAdded = true;
+        req.body.player.includeInAuction = true;
+        req.body.player.isEdited = false;
         const player = new Player(req.body.player);
-        auctionPlayerObject.addedPlayers.push(player);
-        players.push(player);
+        if (auctionPlayersObject.useCustom) {
+          auctionPlayersObject.customPlayers.push(player);
+        } else {
+          auctionPlayersObject.players.push(player);
+        }
+        players.push(req.body.player);
       } else {
         throw new Error('player(s) object not found !');
       }
-      await auctionPlayerObject.save();
+      await auctionPlayersObject.save();
       return {status: true, data: players};
     }, ERRORCODE);
   },
@@ -80,8 +99,15 @@ module.exports = {
       const auctionPlayersObject = await auctionPlayers.find({
         auctionId: req.params.auctionId,
       });
+      if (auctionPlayersObject.length) {
+        auctionPlayersObject = auctionPlayersObject[0];
+      } else throw new DocumentNotFoundError();
       // const a = await auction.findById(req.params.auction_id);
-      auctionPlayersObject.removedPlayers.pull({_id: req.body.player._id});
+      if (auctionPlayersObject.useCustom) {
+        auctionPlayersObject.customPlayers.pull({_id: req.body.player._id});
+      } else {
+        auctionPlayersObject.players.pull({_id: req.body.player._id});
+      }
       await auctionPlayersObject.save();
       return {status: true};
     }, ERRORCODE);
@@ -102,11 +128,15 @@ module.exports = {
 
       if (req.body.player) {
         // Update the player
-        req.body.player.edited = true;
-
-        res = auctionPlayersObject.defaultPlayers.filter((p) => {
-          return p._id == req.body.player._id;
-        });
+        if (auctionPlayersObject.useCustom) {
+          res = auctionPlayersObject.customPlayers.filter((p) => {
+            return p._id == req.body.player._id;
+          });
+        } else {
+          res = auctionPlayersObject.players.filter((p) => {
+            return p._id == req.body.player._id;
+          });
+        }
 
         if (res.length) {
           res = res[0];

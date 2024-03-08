@@ -1,8 +1,13 @@
 const {trywrapper} = require('../utils');
 const ERRORCODE = 430;
-module.exports = queryRunner = async (model, queryObj) => {
+module.exports = queryRunner = async (model, queries) => {
   return await trywrapper(async () => {
-    const result = await model.aggregate(queryObj);
-    return {status: true, data: result};
+    // queries = [{query: [], accessor: ""}]
+    const out = {};
+    for (const q of queries) {
+      const result = await model.aggregate(q.query);
+      out[q.accessor] = result;
+    }
+    return {status: true, data: out};
   }, ERRORCODE);
 };

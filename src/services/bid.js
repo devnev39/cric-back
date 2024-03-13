@@ -38,20 +38,19 @@ module.exports = {
 
       // Find the player in set dataset
       // If not found find in addedPlayers dataset
-
-      let player = auctionPlayersObject[
-          auctionPlayersObject.usedDataset
-      ].filter((p) => p._id == req.body.player._id);
-      if (player.length) {
-        player = player[0];
-      } else {
-        player = auctionPlayersObject['addedPlayers'].filter(
+      let player = null;
+      if (auctionPlayersObject.useCustom) {
+        player = auctionPlayersObject.customPlayers.filter(
             (p) => p._id == req.body.player._id,
         );
-        if (player.length) {
-          player = player[0];
-        } else throw new DocumentNotFoundError();
+      } else {
+        player = auctionPlayersObject.players.filter(
+            (p) => p._id == req.body.player._id,
+        );
       }
+      if (player.length) {
+        player = player[0];
+      } else throw new DocumentNotFoundError();
 
       if (player.sold) {
         throw new Error(`Player already sold to ${player.teamName} !`);
@@ -105,19 +104,19 @@ module.exports = {
 
       // Find player
 
-      let player = auctionPlayersObject[
-          auctionPlayersObject.usedDataset
-      ].filter((p) => p._id == req.body.player._id);
-      if (player.length) {
-        player = player[0];
-      } else {
-        player = auctionPlayersObject['addedPlayers'].filter(
+      let player = null;
+      if (auctionPlayersObject.useCustom) {
+        player = auctionPlayersObject.customPlayers.filter(
             (p) => p._id == req.body.player._id,
         );
-        if (player.length) {
-          player = player[0];
-        } else throw new DocumentNotFoundError();
+      } else {
+        player = auctionPlayersObject.players.filter(
+            (p) => p._id == req.body.player._id,
+        );
       }
+      if (player.length) {
+        player = player[0];
+      } else throw new DocumentNotFoundError();
 
       // Find the team
 

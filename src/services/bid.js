@@ -1,27 +1,14 @@
 // const {default: mongoose} = require('mongoose');
 // const _ = require('lodash');
-// const auction = require('../models/auction');
+// const Auction = require('../models/auction');
 const {trywrapper} = require('../utils');
 const auctionPlayers = require('../models/auctionPlayers');
 const team = require('../models/team');
+const mqtt = require('mqtt');
 const DocumentNotFoundError = require('../errors/documentNotFound');
 const TeamBudgetExhausted = require('../errors/teamBudgetExhausted');
+const Auction = require('../models/auction');
 const ERRCODE = 701;
-
-// const getSoldPlayerQuery = (setDataset, auctionId, bid, reset = false) => {
-//   const filter = {_id: mongoose.Types.ObjectId(auctionId)};
-//   const dataset = `${setDataset}._id`;
-//   filter[dataset] = mongoose.Types.ObjectId(bid.player._id);
-
-//   const soldPriceParameter = `${setDataset}.$.soldPrice`;
-//   const soldParameter = `${setDataset}.$.sold`;
-//   const teamParam = `${setDataset}.$.team_id`;
-//   const update = {};
-//   update[soldPriceParameter] = reset ? 1 : bid.amt;
-//   update[soldParameter] = reset ? 1 : bid.team.name;
-//   update[teamParam] = reset ? 1 : bid.team._id;
-//   return {update, filter};
-// };
 
 module.exports = {
   placeBid: async (req) => {
@@ -86,14 +73,27 @@ module.exports = {
 
       // TODO: Socket implementation
 
-      return {status: true};
+      const auction = await Auction.findById(req.params.auctionId);
+
+      if (auction.allowRealtimeUpdates) {
+        const client = mqtt.connect(process.env.MQTT_HOST, {
+          username: process.env.MQTT_USERNAME,
+          password: process.env.MQTT_PASSWORD,
+        });
+        client.on('connect', () => {
+          client.publish(
+              `/${req.params.auctionId}`,
+              JSON.stringify({player, team: t}),
+          );
+        });
+      }
+      return {status: true, data: {player, team: t}};
     }, ERRCODE);
   },
 
   revertBid: async (req) => {
     return await trywrapper(async () => {
       // req.body.player
-      // req.body.team
 
       let auctionPlayersObject = await auctionPlayers.find({
         auctionId: req.params.auctionId,
@@ -120,7 +120,7 @@ module.exports = {
 
       // Find the team
 
-      const t = await team.findById(req.body.team._id);
+      const t = await team.findById(req.body.player.team_id);
       if (!t) throw new DocumentNotFoundError();
 
       // Remove the player from the team
@@ -138,7 +138,21 @@ module.exports = {
       await t.save();
       await auctionPlayersObject.save();
 
-      return {status: true};
+      const auction = await Auction.findById(req.params.auctionId);
+
+      if (auction.allowRealtimeUpdates) {
+        const client = mqtt.connect(process.env.MQTT_HOST, {
+          username: process.env.MQTT_USERNAME,
+          password: process.env.MQTT_PASSWORD,
+        });
+        client.on('connect', () => {
+          client.publish(
+              `/${req.params.auctionId}`,
+              JSON.stringify({player, team: t}),
+          );
+        });
+      }
+      return {status: true, data: {player, team: t}};
     }, ERRCODE);
   },
 };

@@ -58,6 +58,7 @@ module.exports = {
       auctionJson.maxPlayers = 11;
       auctionJson.allowPublicTeamView = true;
       auctionJson.allowLogin = true;
+      auctionJson.allowRealtimeUpdates = true;
       auctionJson.password = await bcrypt.hash(
           decrypt.decrypt(auctionJson.password),
           5,

@@ -1,7 +1,9 @@
 // const _ = require('lodash');
+const DocumentNotFoundError = require('../errors/documentNotFound');
 const crypto = require('crypto');
-// const Auction = require('../models/auction');
+const Auction = require('../models/auction');
 const Team = require('../models/team');
+const auctionPlayers = require('../models/auctionPlayers');
 const utils = require('../utils/index');
 const ERRORCODE = 420;
 module.exports = {
@@ -19,9 +21,31 @@ module.exports = {
   },
   getTeam: async (req) => {
     return await utils.trywrapper(async () => {
-      const team = Team.findById(req.params.teamId);
+      let team = await Team.find({key: req.params.teamId});
+      if (team.length) {
+        team = team[0];
+      } else throw new DocumentNotFoundError('Team');
+
+      let auctionPlayersObject = await auctionPlayers.find({
+        auctionId: team.auctionId,
+      });
+      if (auctionPlayersObject.length) {
+        auctionPlayersObject = auctionPlayersObject[0];
+      } else throw new DocumentNotFoundError('Players');
+
+      const auction = await Auction.findById(team.auctionId);
+      if (!auction.allowPublicTeamView) {
+        throw new Error('Public team view turned off by admin !');
+      }
+      auction.password = undefined;
+      const players = team.players.map(
+          (p) =>
+            auctionPlayersObject.players.filter((pl) => pl._id.equals(p._id))[0],
+      );
+      team = JSON.parse(JSON.stringify(team));
+      team.players = JSON.parse(JSON.stringify(players));
       if (team) {
-        return {status: true, data: team};
+        return {status: true, data: {team, auction}};
       }
       throw new Error('Team not found !');
     }, ERRORCODE);

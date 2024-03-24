@@ -13,7 +13,7 @@ const server = require('http').createServer(app);
 const origins = [
   'http://localhost:5173',
   'https://cric-front.onrender.com',
-  'http://192.168.0.107:3001',
+  'http://192.168.0.105:5173',
   'https://cric-front.ddnsking.com',
   'http://localhost:3000',
 ];

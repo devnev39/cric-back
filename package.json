@@ -25,6 +25,7 @@
     "lodash": "^4.17.21",
     "mathjs": "^11.5.1",
     "mongoose": "^6.7.5",
+    "mqtt": "^5.5.0",
     "socket.io": "^4.7.1"
   },
   "devDependencies": {

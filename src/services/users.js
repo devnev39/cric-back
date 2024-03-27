@@ -40,7 +40,7 @@ module.exports = {
 
   removeUser: async (req) => {
     return await trywrapper(async () => {
-      await tempUser.findByIdAndDelete(req.params.user_id);
+      await tempUser.findByIdAndDelete(req.params.userId);
       return {status: true};
     }, ERRORCODE);
   },

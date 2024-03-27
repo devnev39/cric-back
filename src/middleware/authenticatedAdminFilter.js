@@ -8,7 +8,7 @@ module.exports = async (req, res, next) => {
       throw error('Log out of auction first !');
     }
     if (req.session.isAdminAuthenticated) {
-      return {status: false, errorCode: 601};
+      return {status: true, errorCode: 601};
     } else {
       return {status: false, errorCode: 401};
     }

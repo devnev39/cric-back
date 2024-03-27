@@ -15,7 +15,7 @@ module.exports = {
       if (result && req.session) {
         if (req.session.isAdminAuthenticated) {
           throw new Error(
-              'Cannot give admin access without logging out from admin panel !',
+              'Cannot give auction access without logging out from admin panel !',
           );
         }
         if (a.allowLogin) {

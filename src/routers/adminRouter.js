@@ -20,7 +20,7 @@ router
     .delete(middlewares.auth.adminAuth, routes.auction.delete);
 
 router
-    .route('/users/:user_id')
+    .route('/users/:userId')
     .put(middlewares.auth.adminAuth, routes.user.put)
     .delete(middlewares.auth.adminAuth, routes.user.delete);
 // router.use(fileUpload());

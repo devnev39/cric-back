@@ -51,6 +51,7 @@ module.exports.AuctionViewModelAdmin = {
   maxPlayers: 'Number',
   allowPublicTeamView: 'checkbox',
   allowLogin: 'checkbox',
+  allowRealTimeUpdates: 'checkbox',
 };
 
 module.exports.PlayerRuleModel = {

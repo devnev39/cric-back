@@ -24,17 +24,21 @@ module.exports = {
   getAuctionAdmin: async () => {
     return await trywrapper(async () => {
       let result = await Auction.find();
-      result = result.map((a) => filterObject(a, AuctionViewModelAdmin));
+      result = result.map((a) => {
+        a.password = undefined;
+        return a;
+      });
+      // result = result.map((a) => filterObject(a, AuctionViewModelAdmin));
       return {status: true, data: result};
     });
   },
 
   updateAuctionAdmin: async (req) => {
     return await trywrapper(async () => {
-      await Auction.findByIdAndUpdate(req.body.auction._id, auctionJson);
-      let auctions = await Auction.find();
-      auctions = auctions.map((a) => filterObject(a, AuctionViewModelAdmin));
-      return {status: true, data: auctions};
+      await Auction.findByIdAndUpdate(req.body.auction._id, req.body.auction);
+      const auction = await Auction.findById(req.body.auction._id);
+      auction.password = undefined;
+      return {status: true, data: auction};
     }, ERRORCODE);
   },
 

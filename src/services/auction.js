@@ -1,6 +1,6 @@
 const Auction = require('../models/auction');
 const bcrypt = require('bcrypt');
-const player = require('../models/player');
+const Player = require('../models/player');
 const {filterObject, trywrapper, decrypt} = require('../utils/index');
 const {
   publicAuctionViewModel,
@@ -10,87 +10,100 @@ const {
   newAuctionAdminAuth,
   deleteAuctionAuth,
 } = require('../utils/auctionAdminAuth');
+const auctionPlayers = require('../models/auctionPlayers');
 const ERRORCODE = 400;
 module.exports = {
   getAuction: async () => {
     return await trywrapper(async () => {
       let result = await Auction.find();
       result = result.map((a) => filterObject(a, publicAuctionViewModel));
-      return {status: 200, data: result};
+      return {status: true, data: result};
     });
   },
 
   getAuctionAdmin: async () => {
     return await trywrapper(async () => {
       let result = await Auction.find();
-      result = result.map((a) => filterObject(a, AuctionViewModelAdmin));
-      return {status: 200, data: result};
+      result = result.map((a) => {
+        a.password = undefined;
+        return a;
+      });
+      // result = result.map((a) => filterObject(a, AuctionViewModelAdmin));
+      return {status: true, data: result};
     });
   },
 
-  updateAuctionAdmin: async (auctionJson) => {
+  updateAuctionAdmin: async (req) => {
     return await trywrapper(async () => {
-      await Auction.findByIdAndUpdate(auctionJson._id, auctionJson);
-      let auctions = await Auction.find();
-      auctions = auctions.map((a) => filterObject(a, AuctionViewModelAdmin));
-      return {status: 200, data: auctions};
+      await Auction.findByIdAndUpdate(req.body.auction._id, req.body.auction);
+      const auction = await Auction.findById(req.body.auction._id);
+      auction.password = undefined;
+      return {status: true, data: auction};
     }, ERRORCODE);
   },
 
-  deleteAuctionAdmin: async (auctionJson) => {
-    await Auction.findByIdAndDelete(auctionJson._id);
-    await Auction.updateMany(
-        {No: {$gt: auctionJson.No}},
-        {$inc: {No: -1}},
-    );
+  deleteAuctionAdmin: async (req) => {
+    await Auction.findByIdAndDelete(req.body.auction._id);
     let auctions = await Auction.find();
     auctions = auctions.map((a) => filterObject(a, AuctionViewModelAdmin));
-    return {status: 200, data: auctions};
+    return {status: true, data: auctions};
   },
 
-  addAuction: async (auctionJson) => {
+  addAuction: async (req) => {
     return await trywrapper(async () => {
-      const result = await newAuctionAdminAuth(auctionJson);
+      // Check the admin id
+      const result = await newAuctionAdminAuth(req.body.adminId);
       if (!result) {
         throw new Error('Admin ID incorrect !');
       }
-      if (!auctionJson.No) {
-        auctionJson.No = (await Auction.countDocuments()) + 1;
-      }
-      auctionJson.Status = 'red';
+      auctionJson = req.body.auction;
+      auctionJson.status = 'red';
       auctionJson.poolingMethod = 'Composite';
-      auctionJson.MaxPlayser = 11;
-      auctionJson.AllowPublicTeamView = true;
-      auctionJson.AllowLogin = true;
-      auctionJson.Password = await bcrypt.hash(
-          decrypt.decrypt(auctionJson.Password),
+      auctionJson.maxPlayers = 11;
+      auctionJson.allowPublicTeamView = true;
+      auctionJson.allowLogin = true;
+      auctionJson.allowRealtimeUpdates = true;
+      auctionJson.password = await bcrypt.hash(
+          decrypt.decrypt(auctionJson.password),
           5,
       );
-      const a = new Auction(auctionJson);
-      a.dPlayers = await player.find();
-      await a.save();
-      return {status: 200};
+      auctionJson.maxBudget = auctionJson.maxBudget ?
+        auctionJson.maxBudget :
+        1000;
+      auctionJson.createdAt = new Date();
+      // Deletion of code - issue 14 - Database changes
+      // moving from embeded document structure to separate collection structure
+      // removed array fields from the auction object namely players, rules, teams
+      const auction = new Auction(auctionJson);
+      const players = await Player.find();
+      const auctionPlayersObject = new auctionPlayers({
+        auctionId: auction._id,
+        defaultPlayers: players,
+      });
+      await auctionPlayersObject.save();
+      await auction.save();
+      return {
+        status: true,
+        data: filterObject(auction, publicAuctionViewModel),
+      };
     }, ERRORCODE);
   },
-  updateAuction: async (auctionJson) => {
+  updateAuction: async (req) => {
     return await trywrapper(async () => {
-      await Auction.findByIdAndUpdate(auctionJson._id, auctionJson);
-      return {status: 200};
+      await Auction.findByIdAndUpdate(req.body.auction._id, req.body.auction);
+      const auction = await Auction.findById(req.body.auction._id);
+      return {status: true, data: auction};
     }, ERRORCODE);
   },
-  deleteAuction: async (auctionJson) => {
+  deleteAuction: async (req) => {
     return await trywrapper(async () => {
-      const result = await deleteAuctionAuth(auctionJson.deleteId);
+      const result = await deleteAuctionAuth(req.body.deleteId);
       if (!result) {
         throw new Error('Delete admin id incorrect !');
       }
-      auctionJson = auctionJson.auction;
-      await Auction.findByIdAndDelete(auctionJson._id);
-      await Auction.updateMany(
-          {No: {$gt: auctionJson.No}},
-          {$inc: {No: -1}},
-      );
-      return {status: 200};
+      auctionJson = req.body.auction;
+      await Auction.findByIdAndDelete(req.body.auction._id);
+      return {status: true};
     }, ERRORCODE);
   },
 };

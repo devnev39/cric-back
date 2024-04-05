@@ -13,7 +13,7 @@ const server = require('http').createServer(app);
 const origins = [
   'http://localhost:5173',
   'https://cric-front.onrender.com',
-  'http://192.168.0.107:3001',
+  'http://192.168.0.105:5173',
   'https://cric-front.ddnsking.com',
   'http://localhost:3000',
 ];
@@ -60,7 +60,7 @@ app.use(
 
 app.use((err, req, res, next) => {
   if (err) {
-    res.json({status: 500, data: err});
+    res.json({status: false, data: err});
   } else {
     next();
   }
@@ -76,7 +76,7 @@ app.use(bodyParser.json());
 app.use([auctionRouter, generalRouter, adminRouter]);
 
 app.route('/*').get((req, res) => {
-  res.json({data: 'Not found !', status: 404});
+  res.status(404).send({data: 'Not found !'});
 });
 
 module.exports = server;

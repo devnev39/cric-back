@@ -8,7 +8,7 @@ module.exports = {
     return await trywrapper(async () => {
       const users = await tempUser.find();
       return {
-        status: 200,
+        status: true,
         data: users,
       };
     }, ERRORCODE);
@@ -16,14 +16,13 @@ module.exports = {
 
   addUser: async (req) => {
     return await trywrapper(async () => {
-      req.body.tempUser.PAT = crypto.randomBytes(48).toString('hex');
-      req.body.tempUser.Enabled = true;
+      req.body.tempUser.pat = crypto.randomBytes(48).toString('hex');
+      req.body.tempUser.enabled = true;
       const user = new tempUser(req.body.tempUser);
       await user.save();
-      const users = await tempUser.find();
       return {
-        status: 200,
-        data: users,
+        status: true,
+        data: user,
       };
     }, ERRORCODE);
   },
@@ -34,16 +33,15 @@ module.exports = {
           req.body.tempUser._id,
           req.body.tempUser,
       );
-      const users = await tempUser.find();
-      return {status: 200, data: users};
+      const user = await tempUser.findById(req.body.tempUser._id);
+      return {status: true, data: user};
     }, ERRORCODE);
   },
 
   removeUser: async (req) => {
     return await trywrapper(async () => {
-      await tempUser.findByIdAndDelete(req.params.user_id);
-      const users = await tempUser.find();
-      return {status: 200, data: users};
+      await tempUser.findByIdAndDelete(req.params.userId);
+      return {status: true};
     }, ERRORCODE);
   },
 };

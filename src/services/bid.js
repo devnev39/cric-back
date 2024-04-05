@@ -1,159 +1,158 @@
-const {default: mongoose} = require('mongoose');
-const _ = require('lodash');
-const auction = require('../models/auction');
-const player = require('../models/player');
+// const {default: mongoose} = require('mongoose');
+// const _ = require('lodash');
+// const Auction = require('../models/auction');
 const {trywrapper} = require('../utils');
+const auctionPlayers = require('../models/auctionPlayers');
+const team = require('../models/team');
+const mqtt = require('mqtt');
+const DocumentNotFoundError = require('../errors/documentNotFound');
+const TeamBudgetExhausted = require('../errors/teamBudgetExhausted');
+const Auction = require('../models/auction');
 const ERRCODE = 701;
-
-const getSoldPlayerQuery = (setDataset, auctionId, bid, reset = false) => {
-  const filter = {_id: mongoose.Types.ObjectId(auctionId)};
-  const dataset = `${setDataset}._id`;
-  filter[dataset] = mongoose.Types.ObjectId(bid.player._id);
-
-  const soldPriceParameter = `${setDataset}.$.SoldPrice`;
-  const soldParameter = `${setDataset}.$.SOLD`;
-  const teamParam = `${setDataset}.$.team_id`;
-  const update = {};
-  update[soldPriceParameter] = reset ? 1 : bid.amt;
-  update[soldParameter] = reset ? 1 : bid.team.Name;
-  update[teamParam] = reset ? 1 : bid.team._id;
-  return {update, filter};
-};
 
 module.exports = {
   placeBid: async (req) => {
     return await trywrapper(async () => {
-      let a = await auction.findById(req.params.auction_id);
+      // req.body.player
+      // req.body.team
+      // req.body.soldPrice
+      let auctionPlayersObject = await auctionPlayers.find({
+        auctionId: req.params.auctionId,
+      });
+      if (auctionPlayersObject.length) {
+        auctionPlayersObject = auctionPlayersObject[0];
+      } else throw new DocumentNotFoundError();
 
-      const setDataset =
-        a.poolingMethod == 'Composite' ? 'dPlayers' : 'cPlayers';
-      const {update, filter} = getSoldPlayerQuery(
-          setDataset,
-          req.params.auction_id,
-          req.body.bid,
-      );
-
-      let result = await auction.updateOne(filter, {$set: update});
-      console.log('BID query result : ', result);
-      if (!result.modifiedCount && !result.matchedCount) {
-        const {update, filter} = getSoldPlayerQuery(
-            'Add',
-            req.params.auction_id,
-            req.body.bid,
+      // Find the player in set dataset
+      // If not found find in addedPlayers dataset
+      let player = null;
+      if (auctionPlayersObject.useCustom) {
+        player = auctionPlayersObject.customPlayers.filter(
+            (p) => p._id == req.body.player._id,
         );
-        result = await auction.updateOne(filter, {$set: update});
-        if (!result.modifiedCount && !result.matchedCount) {
-          throw new Error('Player not found in any dataset !');
-        }
+      } else {
+        player = auctionPlayersObject.players.filter(
+            (p) => p._id == req.body.player._id,
+        );
       }
-      req.body.bid.player.SOLD = req.body.bid.team.Name;
-      req.body.bid.player.SoldPrice = req.body.bid.amt;
-      req.body.bid.player.team_id = req.body.bid.team._id;
-      let teamKey = null;
-      for (const team of a.Teams) {
-        if (team._id == req.body.bid.team._id) {
-          const p = new player(req.body.bid.player);
-          team.Players.push(p);
-          team.Current -= req.body.bid.amt;
-          teamKey = team.Key || null;
-        }
-      }
-      a.Status = 'orange';
+      if (player.length) {
+        player = player[0];
+      } else throw new DocumentNotFoundError();
 
-      await a.save();
-      a = await auction.findById(req.params.auction_id);
-      a[setDataset] = a[setDataset].concat(a['Add']);
-      b = JSON.parse(JSON.stringify(a));
-      for (const team of b.Teams) {
-        team.Players = team.Players.map((player) => {
-          return _.filter(
-              a[setDataset],
-              (dplayer) => dplayer._id == player._id,
-          )[0];
+      if (player.sold) {
+        throw new Error(`Player already sold to ${player.teamName} !`);
+      }
+
+      // Find the required team in team collection
+
+      const t = await team.findById(req.body.team._id);
+      if (!t) throw new DocumentNotFoundError();
+
+      // Check if player can be sold or not !
+
+      if (t.currentBudget < req.body.soldPrice) {
+        throw new TeamBudgetExhausted();
+      }
+
+      // Set the player sold parameters
+
+      player.sold = true;
+      player.team_id = t._id;
+      player.teamName = t.name;
+      player.soldPrice = req.body.soldPrice;
+
+      // Add player to the team list
+
+      t.players.push({_id: player._id});
+      t.currentBudget -= req.body.soldPrice;
+
+      // Save the team, auctionPlayersObject
+
+      await t.save();
+      await auctionPlayersObject.save();
+
+      // TODO: Socket implementation
+
+      const auction = await Auction.findById(req.params.auctionId);
+
+      if (auction.allowRealtimeUpdates) {
+        const client = mqtt.connect(process.env.MQTT_HOST, {
+          username: process.env.MQTT_USERNAME,
+          password: process.env.MQTT_PASSWORD,
         });
-        if (team.Key == teamKey) {
-          if (a.AllowPublicTeamView) {
-            req.io.emit(team.Key, team);
-          }
-        }
+        client.on('connect', () => {
+          client.publish(
+              `/${req.params.auctionId}`,
+              JSON.stringify({player, team: t}),
+          );
+        });
       }
-      if (req.io) {
-        await req.io.emit(req.params.auction_id, b);
-      }
-      return {status: 200, data: a};
+      return {status: true, data: {player, team: t}};
     }, ERRCODE);
   },
 
   revertBid: async (req) => {
     return await trywrapper(async () => {
-      /*
-             Remove the player from team
-             Add the sold price amt to team again
-            */
-      let a = await auction.findById(req.params.auction_id);
+      // req.body.player
 
-      const setDataset =
-        a.poolingMethod == 'Composite' ? 'dPlayers' : 'cPlayers';
-      let {update, filter} = getSoldPlayerQuery(
-          setDataset,
-          req.params.auction_id,
-          req.body,
-          true,
-      );
-      let result = await auction.updateOne(filter, {$unset: update});
-      if (!result.matchedCount && !result.modifiedCount) {
-        const {update, filter} = getSoldPlayerQuery(
-            'Add',
-            req.params.auction_id,
-            req.body,
-            true,
+      let auctionPlayersObject = await auctionPlayers.find({
+        auctionId: req.params.auctionId,
+      });
+      if (auctionPlayersObject.length) {
+        auctionPlayersObject = auctionPlayersObject[0];
+      } else throw new DocumentNotFoundError();
+
+      // Find player
+
+      let player = null;
+      if (auctionPlayersObject.useCustom) {
+        player = auctionPlayersObject.customPlayers.filter(
+            (p) => p._id == req.body.player._id,
         );
-        result = await auction.updateOne(filter, {$unset: update});
-        if (!result.matchedCount && !result.modifiedCount) {
-          throw new Error('Player object not found !');
-        }
+      } else {
+        player = auctionPlayersObject.players.filter(
+            (p) => p._id == req.body.player._id,
+        );
       }
-      filter = {
-        'Teams._id': mongoose.Types.ObjectId(req.body.player.team_id),
-        'Teams.Players._id': mongoose.Types.ObjectId(req.body.player._id),
-      };
-      await auction.updateOne(filter, {
-        $pull: {
-          'Teams.$.Players': {_id: `${req.body.player._id}`},
-        },
-      });
-      let b = await auction.findById(req.params.auction_id);
-      let teamKey = null;
-      for (const team of b.Teams) {
-        if (team._id == req.body.player.team_id) {
-          _.remove(team.Players, (obj) => obj._id == req.body.player._id);
-          team.Current += req.body.player.SoldPrice;
-          teamKey = team.Key || null;
-        }
-      }
-      await b.save();
-      a = await auction.findById(req.params.auction_id);
-      a[setDataset] = a[setDataset].concat(a.Add);
-      b = JSON.parse(JSON.stringify(b));
-      b.Teams.forEach((team) => {
-        team.Players = team.Players.map((player) => {
-          return _.filter(
-              a[setDataset],
-              (dplayer) => dplayer._id == player._id,
-          )[0];
+      if (player.length) {
+        player = player[0];
+      } else throw new DocumentNotFoundError();
+
+      // Find the team
+
+      const t = await team.findById(req.body.player.team_id);
+      if (!t) throw new DocumentNotFoundError();
+
+      // Remove the player from the team
+
+      t.players.pull({_id: req.body.player._id});
+      t.currentBudget += player.soldPrice;
+      player.sold = false;
+      player.soldPrice = 0;
+      player.team_id = undefined;
+      player.teamName = undefined;
+
+      // save player
+      // save auctionPlayersObject
+
+      await t.save();
+      await auctionPlayersObject.save();
+
+      const auction = await Auction.findById(req.params.auctionId);
+
+      if (auction.allowRealtimeUpdates) {
+        const client = mqtt.connect(process.env.MQTT_HOST, {
+          username: process.env.MQTT_USERNAME,
+          password: process.env.MQTT_PASSWORD,
         });
-        if (team.Key == teamKey) {
-          if (a.AllowPublicTeamView) {
-            req.io.emit(team.Key, team);
-          }
-        }
-      });
-      b.password = undefined;
-      a.password = undefined;
-      if (req.io) {
-        await req.io.emit(req.params.auction_id, b);
+        client.on('connect', () => {
+          client.publish(
+              `/${req.params.auctionId}`,
+              JSON.stringify({player, team: t}),
+          );
+        });
       }
-      return {status: 200, data: a};
+      return {status: true, data: {player, team: t}};
     }, ERRCODE);
   },
 };

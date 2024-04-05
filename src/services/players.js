@@ -1,124 +1,161 @@
-const auction = require('../models/auction');
+const DocumentNotFoundError = require('../errors/documentNotFound');
+const auctionPlayers = require('../models/auctionPlayers');
 const Player = require('../models/player');
 const utils = require('../utils/index');
 const {playerValidatorWimodel} = require('../utils/validatemodel');
 const ERRORCODE = 410;
 
-const getSrno = (a) => {
-  let srno = 0;
-  if (a.dPlayers.length && a.poolingMethod == 'Composite') {
-    srno = a.dPlayers.length + 1;
-  }
-  if (a.Add.length && a.poolingMethod == 'Composite') {
-    srno += a.Add.length + 1;
-  }
-  if (a.cPlayers.length && a.poolingMethod == 'Custom') {
-    srno = a.cPlayers.length + 1;
-  }
-  return srno;
-};
+// TODO: evaluate use cases for srno field
+// const getSrno = (a) => {
+//   let srno = 0;
+//   if (a.dPlayers.length && a.poolingMethod == 'Composite') {
+//     srno = a.dPlayers.length + 1;
+//   }
+//   if (a.Add.length && a.poolingMethod == 'Composite') {
+//     srno += a.Add.length + 1;
+//   }
+//   if (a.cPlayers.length && a.poolingMethod == 'Custom') {
+//     srno = a.cPlayers.length + 1;
+//   }
+//   return srno;
+// };
 
 module.exports = {
   getPlayers: async (req) => {
     return await utils.trywrapper(async () => {
-      const a = await auction.findById(req.params.auction_id);
-      const resp = {};
-      if (a.poolingMethod == 'Composite') {
-        resp.Main = a.dPlayers;
-        resp.Add = a.Add;
-        resp.Rmv = a.Rmv;
-        resp.Sup = a.Sup;
-      } else if (a.poolingMethod == 'Custom') {
-        resp.Main = a.cPlayers;
-        resp.Add = a.Add;
-        resp.Rmv = a.Rmv;
-        resp.Sup = a.Sup;
-      }
-      return {status: 200, data: resp};
+      let auctionPlayersObject = await auctionPlayers.find({
+        auctionId: req.params.auctionId,
+      });
+      if (auctionPlayersObject.length) {
+        auctionPlayersObject = auctionPlayersObject[0];
+      } else throw new DocumentNotFoundError();
+      return {status: true, data: auctionPlayersObject};
     }, ERRORCODE);
   },
   uploadPlayers: async (req) => {
     return await utils.trywrapper(async () => {
-      const a = await auction.findById(req.params.auction_id);
-      let srno = getSrno(a);
+      // const a = await auction.findById(req.params.auction_id);
+      const auctionPlayersObject = await auctionPlayers.find({
+        auctionId: req.params.auctionId,
+      });
+      // let srno = getSrno(a);
       for (const p of req.body.players) {
-        p.SRNO = ++srno;
-        if ((valid = playerValidatorWimodel(p, ['IMGURL'])) != true) {
+        // p.SRNO = ++srno;
+        if ((valid = playerValidatorWimodel(p, ['imgUrl'])) != true) {
           throw new Error(valid);
         }
         const player = new Player(p);
-        if (a.poolingMethod == 'Custom') {
-          a.cPlayers.push(player);
-        } else {
-          throw new Error(
-              'Cannot upload players in Composite poolingMethod (Default players dataset) !',
-          );
-        }
+        auctionPlayersObject.customPlayers.push(player);
       }
-      await a.save();
-      return {status: 200};
+      await auctionPlayersObject.save();
+      return {status: true, data: auctionPlayersObject};
     }, ERRORCODE);
   },
   addPlayers: async (req) => {
     return await utils.trywrapper(async () => {
-      const a = await auction.findById(req.params.auction_id);
-      let srno = getSrno(a);
-      let player = null;
+      let auctionPlayersObject = await auctionPlayers.find({
+        auctionId: req.params.auctionId,
+      });
+      if (auctionPlayersObject.length) {
+        auctionPlayersObject = auctionPlayersObject[0];
+      } else throw new DocumentNotFoundError();
+
+      // let srno = getSrno(a); // TODO: solve the srno issue
+
+      const players = [];
       if (req.body.players) {
         for (const p of req.body.players) {
-          p.SRNO = ++srno;
+          p.isAdded = true;
+          p.includeInAuction = true;
+          p.isEdited = false;
           const player = new Player(p);
-          a.Add.push(player);
+          if (auctionPlayersObject.useCustom) {
+            auctionPlayersObject.customPlayers.push(player);
+          } else {
+            auctionPlayersObject.players.push(player);
+          }
+          players.push(player);
         }
       } else if (req.body.player) {
-        req.body.player.SRNO = ++srno;
-        player = new Player(req.body.player);
-        a.Add.push(player);
+        req.body.player.isAdded = true;
+        req.body.player.includeInAuction = true;
+        req.body.player.isEdited = false;
+        const player = new Player(req.body.player);
+        if (auctionPlayersObject.useCustom) {
+          auctionPlayersObject.customPlayers.push(player);
+        } else {
+          auctionPlayersObject.players.push(player);
+        }
+        players.push(req.body.player);
       } else {
         throw new Error('player(s) object not found !');
       }
-      await a.save();
-      return {status: 200, data: player, mergeTo: 'Add'};
+      await auctionPlayersObject.save();
+      return {status: true, data: players};
     }, ERRORCODE);
   },
   deletePlayer: async (req) => {
     return await utils.trywrapper(async () => {
-      const a = await auction.findById(req.params.auction_id);
-      if (!req.body.src && !req.body.dest) {
-        a.Rmv.pull({_id: req.body.player._id});
+      const auctionPlayersObject = await auctionPlayers.find({
+        auctionId: req.params.auctionId,
+      });
+      if (auctionPlayersObject.length) {
+        auctionPlayersObject = auctionPlayersObject[0];
+      } else throw new DocumentNotFoundError();
+      // const a = await auction.findById(req.params.auction_id);
+      if (auctionPlayersObject.useCustom) {
+        auctionPlayersObject.customPlayers.pull({_id: req.body.player._id});
       } else {
-        throw new Error('DELETE method conditions not satisfied !');
+        auctionPlayersObject.players.pull({_id: req.body.player._id});
       }
-      await a.save();
-      return {status: 200};
+      await auctionPlayersObject.save();
+      return {status: true};
     }, ERRORCODE);
   },
   updatePlayer: async (req) => {
     return await utils.trywrapper(async () => {
-      req.body.player.Edited = true;
-      const a = await auction.findById(req.params.auction_id);
-      let player = null;
-      let dataset = a.poolingMethod == 'Composite' ? 'dPlayers' : 'cPlayers';
-      for (const p of a.dPlayers) {
-        if (p._id == req.body.player._id) {
-          player = p;
+      // req.body.player
+      // req.body.datasetProperties
+
+      let auctionPlayersObject = await auctionPlayers.find({
+        auctionId: req.params.auctionId,
+      });
+      if (auctionPlayersObject.length) {
+        auctionPlayersObject = auctionPlayersObject[0];
+      } else throw new DocumentNotFoundError();
+
+      let res;
+
+      if (req.body.player) {
+        // Update the player
+        if (auctionPlayersObject.useCustom) {
+          res = auctionPlayersObject.customPlayers.filter((p) => {
+            return p._id == req.body.player._id;
+          });
+        } else {
+          res = auctionPlayersObject.players.filter((p) => {
+            return p._id == req.body.player._id;
+          });
         }
+
+        if (res.length) {
+          res = res[0];
+        } else throw new DocumentNotFoundError();
+
+        Object.keys(req.body.player).forEach((key) => {
+          res[key] = req.body.player[key];
+        });
+        await auctionPlayersObject.save();
       }
-      if (!player) {
-        for (const p of a.Add) {
-          if (p._id == req.body.player._id) {
-            player = p;
-            dataset = 'Add';
-          }
-        }
+
+      if (req.body.datasetProperties) {
+        // Update the dataset propeties
+        Object.keys(req.body.datasetProperties).forEach((key) => {
+          auctionPlayersObject[key] = req.body.datasetProperties[key];
+        });
+        await auctionPlayersObject.save();
       }
-      console.log(player, dataset);
-      a[dataset].pull({_id: req.body.player._id});
-      a[dataset].push(req.body.player);
-      a[dataset].sort((a, b) => a.SRNO - b.SRNO);
-      await a.save();
-      const resp = await auction.findById(req.params.auction_id);
-      return {status: 200, data: resp};
+      return {status: true, data: res};
     }, ERRORCODE);
   },
   poolPlayers: async (req) => {
@@ -126,33 +163,29 @@ module.exports = {
   },
   movePlayer: async (req) => {
     return await utils.trywrapper(async () => {
-      const a = await auction.findById(req.params.auction_id);
-      let player = null;
-      let {src, dest} = req.body;
-      if (req.body.src == 'mPlayers' || req.body.dest == 'mPlayers') {
-        if (a.poolingMethod == 'Composite' && req.body.src == 'mPlayers') {
-          src = 'dPlayers';
-        }
-        if (a.poolingMethod == 'Composite' && req.body.dest == 'mPlayers') {
-          dest = 'dPlayers';
-        }
-        if (a.poolingMethod == 'Custom' && req.body.src == 'mPlayers') {
-          src = 'cPlayers';
-        }
-        if (a.poolingMethod == 'Custom' && req.body.dest == 'mPlayers') {
-          dest = 'cPlayers';
-        }
-      }
-      for (const p of a[src]) {
-        if (p._id == req.body.player._id) {
-          player = p;
-        }
-      }
-      a[src].pull({_id: req.body.player._id});
-      a[dest].push(player);
-      a[dest].sort((a, b) => a.SRNO - b.SRNO);
-      await a.save();
-      return {status: 200};
+      // req.body.source
+      // req.body.destination
+      // req.body.player
+
+      let auctionPlayersObject = await auctionPlayers.find({
+        auctionId: req.params.auctionId,
+      });
+      if (auctionPlayersObject.length) {
+        auctionPlayersObject = auctionPlayersObject[0];
+      } else throw new DocumentNotFoundError();
+
+      let player = auctionPlayersObject[req.body.source].filter(
+          (p) => p._id == req.body.player._id,
+      );
+      if (player.length) {
+        player = player[0];
+      } else throw new DocumentNotFoundError();
+
+      auctionPlayersObject[req.body.source].pull({_id: req.body.player._id});
+      auctionPlayersObject[req.body.destination].push(player);
+
+      await auctionPlayersObject.save();
+      return {status: true};
     }, ERRORCODE);
   },
 };

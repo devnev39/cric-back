@@ -18,21 +18,6 @@ const origins = [
   'http://localhost:3000',
 ];
 
-const io = require('socket.io')(server, {
-  cors: {
-    origin: origins,
-    method: ['*'],
-    credentials: true,
-  },
-});
-
-io.on('connection', (socket) => {
-  console.log('Connected to socket');
-});
-io.on('disconnection', (socket) => {
-  console.log('Disconnection from : ', socket);
-});
-
 console.log('production : ', production);
 
 app.use(
@@ -64,11 +49,6 @@ app.use((err, req, res, next) => {
   } else {
     next();
   }
-});
-
-app.use((req, res, next) => {
-  req.io = io;
-  next();
 });
 
 app.use(bodyParser.json());

@@ -5,3 +5,4 @@ app.test.js
 *.drawio
 *.mdb.js
 .env
+.vercel

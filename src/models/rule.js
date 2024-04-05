@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 
 const ruleSchema = mongoose.Schema({
-  ruleName: String,
+  auctionId: String,
+  name: String,
   rule: String,
   type: String,
 });

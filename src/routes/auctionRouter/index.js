@@ -13,18 +13,18 @@ module.exports = {
     await utils.resultwrapper(
         async () => {
           return utils.trywrapper(async () => {
-            const a = await auction.findById(req.params.auction_id);
-            a.Password = undefined;
-            return {status: 200, data: a};
+            const a = await auction.findById(req.params.auctionId);
+            a.password = undefined;
+            return {status: true, data: a};
           }, ERRORCODE);
         },
         req,
         res,
     ),
   updateAuction: async (req, res) =>
-    await utils.resultwrapper(updateAuction, req, res, req.body.auction),
+    await utils.resultwrapper(updateAuction, req, res, req),
   deleteAuction: async (req, res) =>
-    await utils.resultwrapper(deleteAuction, req, res, req.body),
+    await utils.resultwrapper(deleteAuction, req, res, req),
   teams: teams,
   players: players,
   bid: bid,

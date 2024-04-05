@@ -1,11 +1,13 @@
 const mongoose = require('mongoose');
 
+// Will have access to default player set in players collection
+
 const tempUserSchema = mongoose.Schema({
-  Email: String,
-  Name: String,
-  PAT: String,
-  Expiry: String,
-  Enabled: Boolean,
+  email: String,
+  name: String,
+  pat: String,
+  expiry: String,
+  enabled: Boolean,
 });
 
 module.exports = mongoose.model('TempUser', tempUserSchema);

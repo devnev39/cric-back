@@ -3,7 +3,7 @@ const trywrapper = async (func, errcode) => {
     return await func();
   } catch (error) {
     console.log(error);
-    return {status: errcode, data: error.message};
+    return {status: false, errorCode: errcode, data: error.message};
   }
 };
 module.exports = trywrapper;

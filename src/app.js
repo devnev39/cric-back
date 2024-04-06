@@ -16,6 +16,7 @@ const origins = [
   'http://192.168.0.105:5173',
   'https://cric-front.ddnsking.com',
   'http://localhost:3000',
+  'https://cric-front.vercel.app',
 ];
 
 console.log('production : ', production);

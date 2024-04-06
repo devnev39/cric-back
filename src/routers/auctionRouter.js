@@ -48,6 +48,10 @@ router
     .delete(middlewares.auth.auctionAuth, routes.bid.revertBid);
 
 router
+    .route('/rule')
+    .get(middlewares.auth.auctionAuth, routes.rule.getAllRules);
+
+router
     .route('/rule/:auctionId')
     .get(middlewares.auth.auctionAuth, routes.rule.getRules)
     .delete(middlewares.auth.auctionAuth, routes.rule.deleteRule);

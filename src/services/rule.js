@@ -11,6 +11,14 @@ module.exports = {
       return {status: true, data: rules};
     }, ERRCODE);
   },
+
+  getAllRules: async (req) => {
+    return await trywrapper(async () => {
+      const rules = await Rule.find();
+      return {status: true, data: rules};
+    }, ERRCODE);
+  },
+
   addRule: async (req) => {
     return await trywrapper(async () => {
       // Issue 14 - (devnev39/cric-front)

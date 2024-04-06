@@ -78,7 +78,7 @@ module.exports = {
       const players = await Player.find();
       const auctionPlayersObject = new auctionPlayers({
         auctionId: auction._id,
-        defaultPlayers: players,
+        players,
       });
       await auctionPlayersObject.save();
       await auction.save();

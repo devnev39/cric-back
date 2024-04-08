@@ -121,12 +121,13 @@ module.exports = {
       // Find the team
 
       const t = await team.findById(req.body.player.team_id);
-      if (!t) throw new DocumentNotFoundError();
+      if (!t && !req.body.resetHard) throw new DocumentNotFoundError();
 
       // Remove the player from the team
-
-      t.players.pull({_id: req.body.player._id});
-      t.currentBudget += player.soldPrice;
+      if (t) {
+        t.players.pull({_id: req.body.player._id});
+        t.currentBudget += player.soldPrice;
+      }
       player.sold = false;
       player.soldPrice = 0;
       player.team_id = undefined;
@@ -134,8 +135,7 @@ module.exports = {
 
       // save player
       // save auctionPlayersObject
-
-      await t.save();
+      if (t) await t.save();
       await auctionPlayersObject.save();
 
       const auction = await Auction.findById(req.params.auctionId);

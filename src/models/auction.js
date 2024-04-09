@@ -6,6 +6,7 @@ const auctionSchema = mongoose.Schema({
   status: String,
   poolingMethod: String,
   maxPlayers: Number,
+  priceUnit: String,
   allowPublicTeamView: Boolean,
   allowRealtimeUpdates: Boolean,
   allowLogin: Boolean,

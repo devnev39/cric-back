@@ -11,6 +11,7 @@ const auctionSchema = mongoose.Schema({
   allowRealtimeUpdates: Boolean,
   allowLogin: Boolean,
   createdAt: Date,
+  freeze: Boolean,
 });
 
 module.exports = mongoose.model('Auction', auctionSchema);

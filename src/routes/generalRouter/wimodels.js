@@ -10,6 +10,13 @@ const modelDictionary = {
   tempUser: webInputModels.tempUser,
   AuctionViewModelAdmin: webInputModels.AuctionViewModelAdmin,
 };
+/**
+ * Retrieves a model from the modelDictionary based on the specified model name in the request parameters.
+ *
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ * @return {void} Sends a JSON response with the status and data of the requested model.
+ */
 module.exports = (req, res) => {
   if (Object.keys(modelDictionary).indexOf(req.params.model) == -1) {
     utils.error(res, ERRORCODE, 'Requested model not found in dictionary !');

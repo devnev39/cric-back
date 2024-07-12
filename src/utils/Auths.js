@@ -7,6 +7,13 @@ const trywrapper = require('./trywrapper');
 const ERRCODE = 510;
 
 module.exports = {
+  /**
+   * Authenticates the auction based on the provided request and response.
+   *
+   * @param {Object} req - The request object.
+   * @param {Object} res - The response object.
+   * @return {Promise<Object>} A promise that resolves to an object containing the authentication status.
+   */
   _auctionAuth: async (req, res) => {
     const response = await trywrapper(async () => {
       const a = await auction.findById(req.body._id);
@@ -43,6 +50,13 @@ module.exports = {
   set auctionAuth(value) {
     this._auctionAuth = value;
   },
+  /**
+   * Authenticates the admin user.
+   *
+   * @param {Object} req - The request object.
+   * @param {Object} res - The response object.
+   * @return {Promise<Object>} A promise that resolves to an object containing the authentication status and error code.
+   */
   adminAuth: async (req, res) => {
     const response = await trywrapper(async () => {
       const pass = decrypt.decrypt(req.body.password);

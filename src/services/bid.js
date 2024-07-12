@@ -11,6 +11,12 @@ const Auction = require('../models/auction');
 const ERRCODE = 701;
 
 module.exports = {
+  /**
+   * Place a bid for a player in an auction.
+   *
+   * @param {Object} req - The request object containing player, team, and soldPrice information.
+   * @return {Object} Object containing the status of the bid and the player and team data.
+   */
   placeBid: async (req) => {
     return await trywrapper(async () => {
       // req.body.player
@@ -71,8 +77,6 @@ module.exports = {
       await t.save();
       await auctionPlayersObject.save();
 
-      // TODO: Socket implementation
-
       const auction = await Auction.findById(req.params.auctionId);
 
       if (auction.allowRealtimeUpdates) {
@@ -91,6 +95,12 @@ module.exports = {
     }, ERRCODE);
   },
 
+  /**
+   * Reverts a bid for a player in an auction.
+   *
+   * @param {Object} req - The request object containing auctionId and player information.
+   * @return {Object} Object containing the status of the bid reversion and the player and team data.
+   */
   revertBid: async (req) => {
     return await trywrapper(async () => {
       // req.body.player

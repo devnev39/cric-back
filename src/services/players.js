@@ -5,22 +5,13 @@ const utils = require('../utils/index');
 const {playerValidatorWimodel} = require('../utils/validatemodel');
 const ERRORCODE = 410;
 
-// TODO: evaluate use cases for srno field
-// const getSrno = (a) => {
-//   let srno = 0;
-//   if (a.dPlayers.length && a.poolingMethod == 'Composite') {
-//     srno = a.dPlayers.length + 1;
-//   }
-//   if (a.Add.length && a.poolingMethod == 'Composite') {
-//     srno += a.Add.length + 1;
-//   }
-//   if (a.cPlayers.length && a.poolingMethod == 'Custom') {
-//     srno = a.cPlayers.length + 1;
-//   }
-//   return srno;
-// };
-
 module.exports = {
+  /**
+   * Retrieves players for a specific auction based on the auction ID.
+   *
+   * @param {Object} req - The request object containing the auction ID.
+   * @return {Object} An object with status true and the data of auction players.
+   */
   getPlayers: async (req) => {
     return await utils.trywrapper(async () => {
       let auctionPlayersObject = await auctionPlayers.find({
@@ -32,6 +23,12 @@ module.exports = {
       return {status: true, data: auctionPlayersObject};
     }, ERRORCODE);
   },
+  /**
+   * Uploads players to the auction.
+   *
+   * @param {Object} req - The request object.
+   * @return {Promise<Object>} - A promise that resolves to an object with the status and data of the auction players.
+   */
   uploadPlayers: async (req) => {
     return await utils.trywrapper(async () => {
       // const a = await auction.findById(req.params.auction_id);
@@ -51,6 +48,16 @@ module.exports = {
       return {status: true, data: auctionPlayersObject};
     }, ERRORCODE);
   },
+  /**
+   * Adds players to the auction.
+   *
+   * @param {Object} req - The request object containing the auction ID and player(s) to be added.
+   * @param {string} req.params.auctionId - The ID of the auction.
+   * @param {Array<Object>|Object} req.body.players - The player(s) to be added.
+   * @param {Object} req.body.player - The player to be added (alternative to req.body.players).
+   * @throws {Error} If the player(s) object is not found.
+   * @return {Promise<Object>} - A promise that resolves to an object with the status and data of the added players.
+   */
   addPlayers: async (req) => {
     return await utils.trywrapper(async () => {
       let auctionPlayersObject = await auctionPlayers.find({
@@ -59,8 +66,6 @@ module.exports = {
       if (auctionPlayersObject.length) {
         auctionPlayersObject = auctionPlayersObject[0];
       } else throw new DocumentNotFoundError();
-
-      // let srno = getSrno(a); // TODO: solve the srno issue
 
       const players = [];
       if (req.body.players) {
@@ -94,6 +99,13 @@ module.exports = {
       return {status: true, data: players};
     }, ERRORCODE);
   },
+
+  /**
+   * Deletes a player from the auction players based on the provided request.
+   *
+   * @param {Object} req - The request object containing the auction ID and player to be deleted.
+   * @return {Promise<Object>} - A promise that resolves to an object with the status of the deletion.
+   */
   deletePlayer: async (req) => {
     return await utils.trywrapper(async () => {
       const auctionPlayersObject = await auctionPlayers.find({
@@ -112,6 +124,16 @@ module.exports = {
       return {status: true};
     }, ERRORCODE);
   },
+
+  /**
+   * Updates a player in the auction players based on the provided request.
+   *
+   * @param {Object} req - The request object containing the auction ID and player to be updated.
+   * @param {Object} req.body.player - The player object to be updated.
+   * @param {Object} req.body.datasetProperties - The dataset properties to be updated.
+   * @return {Promise<Object>} - A promise that resolves to an object with the status and data of the updated player.
+   * @throws {DocumentNotFoundError} - If the auction players object is not found.
+   */
   updatePlayer: async (req) => {
     return await utils.trywrapper(async () => {
       // req.body.player
@@ -158,9 +180,18 @@ module.exports = {
       return {status: true, data: res};
     }, ERRORCODE);
   },
-  poolPlayers: async (req) => {
-    return await utils.trywrapper(async () => {}, ERRORCODE);
-  },
+  /**
+   * Moves a player from one source to a destination in the auction players.
+   *
+   * @param {Object} req - The request object containing the auction ID, source, destination, and player to be moved.
+   * @param {string} req.params.auctionId - The ID of the auction.
+   * @param {string} req.body.source - The source where the player is currently located.
+   * @param {string} req.body.destination - The destination where the player will be moved to.
+   * @param {Object} req.body.player - The player to be moved.
+   * @param {string} req.body.player._id - The ID of the player.
+   * @throws {DocumentNotFoundError} - If the auction players object or the player is not found.
+   * @return {Promise<Object>} - A promise that resolves to an object with the status of the move.
+   */
   movePlayer: async (req) => {
     return await utils.trywrapper(async () => {
       // req.body.source

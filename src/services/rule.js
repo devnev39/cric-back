@@ -5,6 +5,16 @@ const Rule = require('../models/rule');
 const ERRCODE = 801;
 
 module.exports = {
+  /**
+   * Retrieves the rules associated with a specific auction.
+   *
+   * @param {Object} req - The request object.
+   * @param {string} req.params.auctionId - The ID of the auction.
+   * @return {Promise<Object>} A promise that resolves to an object containing the status and data.
+   * @return {boolean} status - The status of the operation.
+   * @return {Array} data - The retrieved rules.
+   * @throws {Error} If an error occurs during the retrieval process.
+   */
   getRules: async (req) => {
     return await trywrapper(async () => {
       const rules = await Rule.find({auctionId: req.params.auctionId});
@@ -12,6 +22,12 @@ module.exports = {
     }, ERRCODE);
   },
 
+  /**
+   * Retrieves all rules.
+   *
+   * @param {Object} req - The request object.
+   * @return {Promise<Object>} A promise that resolves to an object containing the status and data.
+   */
   getAllRules: async (req) => {
     return await trywrapper(async () => {
       const rules = await Rule.find();
@@ -19,6 +35,14 @@ module.exports = {
     }, ERRCODE);
   },
 
+  /**
+   * Adds a new rule.
+   *
+   * @param {Object} req - The request object.
+   * @param {Object} req.body.rule - The rule to be added.
+   * @return {Promise<Object>} A promise that resolves to an object containing the status and data.
+   * @throws {Error} If an error occurs during the addition process.
+   */
   addRule: async (req) => {
     return await trywrapper(async () => {
       // Issue 14 - (devnev39/cric-front)
@@ -28,6 +52,14 @@ module.exports = {
     }, ERRCODE);
   },
 
+  /**
+   * Deletes a rule from the database.
+   *
+   * @param {Object} req - The request object.
+   * @param {string} req.params.auctionId - The ID of the rule to delete.
+   * @return {Promise<Object>} A promise that resolves to an object with a status property indicating the success of the deletion.
+   * @throws {Error} If an error occurs during the deletion process.
+   */
   deleteRule: async (req) => {
     return await trywrapper(async () => {
       // req.params.auctionId as rule._id

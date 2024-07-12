@@ -13,6 +13,13 @@ module.exports = {
     // Return status
     utils.Auths.adminAuth(req, res);
   },
+  /**
+   * Logs out the auction session.
+   *
+   * @param {Object} req - The request object.
+   * @param {Object} res - The response object.
+   * @return {Promise<void>} A promise that resolves when the logout is complete.
+   */
   logoutAuction: async (req, res) => {
     if (req.session) {
       if (

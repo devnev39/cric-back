@@ -49,7 +49,8 @@ module.exports = {
     }, ERRORCODE);
   },
   /**
-   * Adds players to the auction.
+   * Adds players to the auction. If the players field is an array, each player in the array is added,
+   * otherwise the player is added as a single object.
    *
    * @param {Object} req - The request object containing the auction ID and player(s) to be added.
    * @param {string} req.params.auctionId - The ID of the auction.
@@ -60,20 +61,25 @@ module.exports = {
    */
   addPlayers: async (req) => {
     return await utils.trywrapper(async () => {
+      // Find the auctionPlayers object for the given auction ID.
       let auctionPlayersObject = await auctionPlayers.find({
         auctionId: req.params.auctionId,
       });
+      // If the auctionPlayers object is not found, throw a DocumentNotFoundError.
       if (auctionPlayersObject.length) {
         auctionPlayersObject = auctionPlayersObject[0];
       } else throw new DocumentNotFoundError();
 
       const players = [];
+      // If the players field is an array, loop through and add each player.
       if (req.body.players) {
         for (const p of req.body.players) {
           p.isAdded = true;
           p.includeInAuction = true;
           p.isEdited = false;
           const player = new Player(p);
+          // If the auctionPlayers object is set to use custom players, add the player to the customPlayers array,
+          // otherwise add it to the players array.
           if (auctionPlayersObject.useCustom) {
             auctionPlayersObject.customPlayers.push(player);
           } else {
@@ -82,10 +88,13 @@ module.exports = {
           players.push(player);
         }
       } else if (req.body.player) {
+        // If the players field is not an array, add the player as a single object.
         req.body.player.isAdded = true;
         req.body.player.includeInAuction = true;
         req.body.player.isEdited = false;
         const player = new Player(req.body.player);
+        // If the auctionPlayers object is set to use custom players, add the player to the customPlayers array,
+        // otherwise add it to the players array.
         if (auctionPlayersObject.useCustom) {
           auctionPlayersObject.customPlayers.push(player);
         } else {
@@ -93,9 +102,12 @@ module.exports = {
         }
         players.push(req.body.player);
       } else {
+        // If the players field is not an array and the player field is not an object, throw an Error.
         throw new Error('player(s) object not found !');
       }
+      // Save the changes to the auctionPlayers object.
       await auctionPlayersObject.save();
+      // Return a promise with the status and data of the added players.
       return {status: true, data: players};
     }, ERRORCODE);
   },
@@ -114,7 +126,6 @@ module.exports = {
       if (auctionPlayersObject.length) {
         auctionPlayersObject = auctionPlayersObject[0];
       } else throw new DocumentNotFoundError();
-      // const a = await auction.findById(req.params.auction_id);
       if (auctionPlayersObject.useCustom) {
         auctionPlayersObject.customPlayers.pull({_id: req.body.player._id});
       } else {
@@ -136,8 +147,8 @@ module.exports = {
    */
   updatePlayer: async (req) => {
     return await utils.trywrapper(async () => {
-      // req.body.player
-      // req.body.datasetProperties
+      // req.body.player - The player object to be updated
+      // req.body.datasetProperties - The dataset properties to be updated
 
       let auctionPlayersObject = await auctionPlayers.find({
         auctionId: req.params.auctionId,
